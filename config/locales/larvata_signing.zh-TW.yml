@@ -1,0 +1,43 @@
+zh-TW:
+  labels:
+    doc:
+      signing_records_not_found: 找不到簽核紀錄
+      must_select_signer_for_waiting: 必須選擇加簽人員
+  activerecord:
+    models:
+    attributes:
+  enums:
+    larvata_signing_record:
+      state:
+        pending: 等待處理
+        notify: 副本
+        terminated: 中止
+        signed: 已完成
+      signed_result:
+        waiting: 未決
+        approved: 核准
+        rejected: 駁回
+    larvata_signing_stage:
+      typing:
+        sign: 串簽
+        counter_sign: 會簽
+        any_supervisor: 擇辦
+        inform: 知會
+      state:
+        pending: 尚未開始
+        signing: 進行中
+        completed: 已完成
+    larvata_signing_doc:
+      state:
+        draft: 草稿
+        rejected: 駁回
+        signing: 進行中
+        void: 作廢
+        approved: 通過
+    larvata_signing_resource_record:
+      state:
+        pending: 尚未開始
+        signing: 進行中
+        rejected: 駁回
+        implement: 決行
+        archived: 封存
