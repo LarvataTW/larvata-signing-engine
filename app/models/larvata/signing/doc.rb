@@ -18,6 +18,8 @@ module Larvata::Signing
 
     has_many :records, class_name: "Larvata::Signing::Record", through: :stages
 
+    belongs_to :applicant, foreign_key: "applicant_id", class_name: "User", optional: true
+
     before_create :set_default_values
     before_save :set_signing_number
 
@@ -27,7 +29,7 @@ module Larvata::Signing
 
       send(signing_result, comment, records, opt)
 
-      self
+      self.reload
     end
 
     private 
@@ -90,7 +92,7 @@ module Larvata::Signing
           rec.save!
 
           if can_enter_next_stage?(rec) # 是否可進入到下個階段
-            enter_next_stage(rec, opt)
+            enter_next_stage(rec.stage, opt)
           end
         end
       end
@@ -121,26 +123,26 @@ module Larvata::Signing
               res_rec.signing_resourceable&.send(resource&.returned_method)
             end
 
-            # TBD 發送駁回通知給申請人員
+            # 發送駁回通知給申請人員
+            send_messages('reject', stage.id, rec.id)
           elsif opt.present? # 退回到指定階段
             reset_stages = stages.includes(:records).where("seq >= ? and seq <= ?", opt, stage&.seq)
             reset_stages.each_with_index do |s, index|
               # 原本還尚未簽核的紀錄，會變為「中止」
-              s.records.where(signing_result: nil).update(state: 'terminated')
+              s.records.where(signing_result: nil).update_all(state: 'terminated')
 
               # 會把「退回階段」到「退簽階段」之間所有簽核資料，往原本的階段再額外建立一整組空白紀錄，然後開始簽核。
-              signers = s.records.map{ |r| r.attributes.slice(:signer_id, :dept_id, :role) }.uniq
+              signers = s.records.map{ |r| r.attributes.slice("signer_id", "dept_id", "role") }.uniq
               s.records.create!(signers)
 
               if index == 0
-                s.state = 'signing'
+                s.signing!
+
+                # 發送簽核通知給申請人員
+                send_messages('signing', s.id)
               else
-                s.state = 'pending'
+                s.pending!
               end
-
-              s.save!
-
-              # TBD 發送簽核通知給申請人員
             end
           end
         end
@@ -166,6 +168,7 @@ module Larvata::Signing
           rec.stage.records.create(signer_id: opt, dept_id: nil, role: nil, parent_record_id: rec.id)
 
           # TBD 發送簽核通知給加簽人員
+          send_messages('signing', rec.stage.id, rec.id)
         end
       end
     end
@@ -175,11 +178,12 @@ module Larvata::Signing
       stage = rec.stage
       if rec.parent_record_id.present? # 加簽
         # 建立一個新的簽核紀錄給原簽核人員
-        parent_rec = Larvata::Signing::Record.find_by(rec.parent_record_id)
-        Larvata::Signing::Record.create_record_and_send_message!(parent_rec&.stage_id, parent_rec&.signer_id)
+        parent_rec = Larvata::Signing::Record.find_by(id: rec.parent_record_id)
+        new_rec = Larvata::Signing::Record.create_record_and_send_message!(parent_rec&.larvata_signing_stage_id, parent_rec&.signer_id)
 
-        # TBD 發送簽核通知給原簽核人員
-      elsif stage.sign? # 串簽
+        # 發送簽核通知給原簽核人員
+        send_messages('signing', rec.stage.id, new_rec&.id)
+      elsif stage.sign? or stage.any_supervisor? # 串簽 or 擇辦
         # 進到下一個階段或是讓申請單據簽核狀態變為核准
         can_enter_next_stage = true
       elsif stage.counter_sign? # 會簽
@@ -193,8 +197,7 @@ module Larvata::Signing
     end
 
     # 進入到下個階段
-    def enter_next_stage(rec, opt)
-      stage = rec.stage
+    def enter_next_stage(stage, opt = nil)
       if stage.is_last? # 最後階段
         # 讓resource_records 簽核單原始單據編號資料的狀態變為「決行」或是「封存」
         implement_resource_id = opt || resource_records.first&.id
@@ -210,11 +213,33 @@ module Larvata::Signing
         # 更新此階段狀態為已完成
         stage.update_attributes!(state: "completed")
 
-        # 更新下一階段的狀態為簽核中
         next_stage = stage.next_stage
-        next_stage&.update_attributes!(state: "signing")
 
-        # TBD 發送下一階段的簽核人員通知
+        if next_stage.inform?
+          # 發送下一階段的人員通知
+          send_messages('inform', next_stage.id)
+
+          # 發送通知後，繼續往下一個階段
+          enter_next_stage(next_stage)
+        else
+          # 更新下一階段的狀態為簽核中
+          next_stage&.update_attributes!(state: "signing")
+
+          # 發送下一階段的簽核人員通知
+          send_messages('signing', next_stage.id)
+        end
+      end
+    end
+
+    # 發送簽核通知
+    def send_messages(typing, stage_id = nil, record_id = nil)
+      records = Larvata::Signing::Record.includes(:signer, stage: { doc: :resource })
+      records = records.where(larvata_signing_stage_id: stage_id)
+      records = records.where(id: record_id) unless record_id.nil?
+
+      records.each do |rec|
+        # Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
+        Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
       end
     end
   end

@@ -31,11 +31,11 @@ module Larvata::Signing
 
     # 同一階段內，是否沒有尚未簽核的資料
     def has_no_signed_record?
-      has_not_yet_signed(stage&.id).size == 0
+      has_not_yet_signed.size == 0
     end
 
     # 取得同一階段內尚未簽核的紀錄
-    def has_not_yet_signed(stage_id)
+    def has_not_yet_signed
       records.where(signing_result: nil)
     end
 

@@ -24,8 +24,7 @@ module Larvata::Signing
         rec.signer_id = signer_id
         rec.parent_record_id = parent_record_id 
         rec.save!
-
-        # TBD 發送簽核通知
+        rec
       end
     end
 

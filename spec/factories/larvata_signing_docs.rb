@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :inquirement_doc, class: "Larvata::Signing::Doc" do
     title { "詢價單簽核單" }
     remind_period { 24 }
+    applicant_id { FactoryBot.create(:applicant_user) }
 
     trait :with_resource_records do
       after(:build) do |doc|

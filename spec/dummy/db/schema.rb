@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200207034308) do
+ActiveRecord::Schema.define(version: 20200210055307) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -41,6 +41,8 @@ ActiveRecord::Schema.define(version: 20200207034308) do
     t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "applicant_id"
+    t.index ["applicant_id"], name: "index_larvata_signing_docs_on_applicant_id"
     t.index ["larvata_signing_flow_id"], name: "index_larvata_signing_docs_on_larvata_signing_flow_id"
     t.index ["larvata_signing_resource_id"], name: "index_larvata_signing_docs_on_larvata_signing_resource_id"
     t.index ["signing_number"], name: "index_larvata_signing_docs_on_signing_number"
@@ -156,6 +158,7 @@ ActiveRecord::Schema.define(version: 20200207034308) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email"
   end
 
 end

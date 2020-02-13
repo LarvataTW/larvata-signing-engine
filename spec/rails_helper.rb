@@ -11,6 +11,7 @@ require 'rspec/rails'
 
 require 'factory_bot_rails'
 require 'support/factory_bot'
+require 'support/action_mailer'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
