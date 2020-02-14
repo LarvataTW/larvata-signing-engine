@@ -19,7 +19,7 @@ FactoryBot.define do
 
   factory :president_record, class: "Larvata::Signing::Record" do
     dept_id { 4 }
-    signer_id { 5 }
+    signer_id { 6 }
     role { "總經理" }
   end
 end

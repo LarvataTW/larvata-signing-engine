@@ -1,10 +1,6 @@
 require 'rails_helper'
 
 describe Larvata::Signing::Doc do 
-  before {
-    ActionMailer.clean_deliveries
-  }
-
   let!(:applicant) { create(:applicant_user) }
   let!(:supervisor) { create(:supervisor_user) }
   let!(:construction_manager) { create(:construction_manager_user) }
@@ -29,6 +25,14 @@ describe Larvata::Signing::Doc do
   let(:third_stage) { doc.stages.third }
   let(:third_stage_records) { doc.stages.third.records }
 
+  subject(:begin_signing) {
+    doc.commit
+  }
+
+  before {
+    ActionMailer.clean_deliveries
+  }
+
   describe ".pull_flow" do
     context "with creating signing_doc" do
       subject(:doc_from_flow) {
@@ -42,8 +46,31 @@ describe Larvata::Signing::Doc do
     end
   end
 
+  describe "#commit" do
+    it "begin signing" do
+      begin_signing
+
+      expect(doc.reload.state).to eq("signing")
+      expect(first_stage.reload.state).to eq("signing")
+      expect(ActionMailer::Base.deliveries.count).to eq(1)
+    end
+  end
+
   describe "#sign" do 
+    context "when doc state is not signing" do
+      it "will get doc errors" do 
+        doc.sign(supervisor, :approve, "pass")
+
+        expect(doc.errors.full_messages.any?).to eq(true)
+      end
+    end
+
     context "in the first stage" do
+      before {
+        begin_signing
+        ActionMailer.clean_deliveries
+      }
+
       it "when supervisor approve" do 
         doc.sign(supervisor, :approve, "pass")
 
@@ -74,6 +101,7 @@ describe Larvata::Signing::Doc do
     context "in the second stage" do 
       context "when construction_manager approve" do 
         subject(:doc_with_second_stage_signing_and_construction_manager_approved) { 
+          doc.commit
           doc.sign(supervisor, :approve, "pass")
           doc.sign(construction_manager, :approve, "pass")
 
@@ -122,10 +150,6 @@ describe Larvata::Signing::Doc do
             doc
           }
 
-          subject(:clean_deliveries) {
-            ActionMailer.clean_deliveries
-          }
-
           it "financial_manager signing record created" do 
             waiting_for_financial_manager_signing
 
@@ -137,7 +161,7 @@ describe Larvata::Signing::Doc do
           it "when financial_manager approve" do 
             doc = waiting_for_financial_manager_signing
 
-            clean_deliveries
+            ActionMailer.clean_deliveries
 
             doc.sign(financial_manager, :approve, "pass")
 
@@ -149,7 +173,7 @@ describe Larvata::Signing::Doc do
           it "when financial_manager reject" do 
             doc = waiting_for_financial_manager_signing
 
-            clean_deliveries
+            ActionMailer.clean_deliveries
 
             doc.sign(financial_manager, :reject, "reject")
 
@@ -161,6 +185,28 @@ describe Larvata::Signing::Doc do
             expect(ActionMailer::Base.deliveries.count).to eq(1)
           end
         end
+      end
+    end
+
+    context "in the third stage" do
+      subject(:doc_with_third_stage_signing) { 
+        doc.commit
+        doc.sign(supervisor, :approve, "pass")
+        doc.sign(construction_manager, :approve, "pass")
+        doc.sign(sales_manager, :approve, "pass")
+
+        ActionMailer.clean_deliveries
+
+        doc
+      }
+
+      it "when president approve" do 
+        doc = doc_with_third_stage_signing
+        doc.sign(president, :approve, "pass", first_resource_record.signing_resourceable.id)
+
+        expect(doc.state).to eq("approved")
+        expect(first_resource_record.reload.state).to eq("implement")
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
       end
     end
   end

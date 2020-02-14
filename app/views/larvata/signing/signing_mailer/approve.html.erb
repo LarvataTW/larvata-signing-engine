@@ -1,0 +1,5 @@
+<p><%= @rec.signer.name %> 您好，</p>
+
+<p>您送出的<%= @rec.stage&.doc&.resource&.name %>簽核單已核准，</p>
+
+<p>請到「簽核作業」＞「查詢簽呈」，或點擊<%= link_to '這裡', @admin_doc_url %>進入該簽核單，謝謝。</p>
