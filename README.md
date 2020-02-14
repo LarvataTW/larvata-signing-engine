@@ -25,6 +25,13 @@ This setting will be used to generate doc page hyperlink of email, they can ente
 
 ## Usage
 
+在取得簽核單資料後，可以使用 commit 方法來進行送簽的作業。
+簽核單和第一個簽核階段的狀態會由草稿（draft）變為簽核中（signing），並發送簽核通知。
+
+```ruby
+doc.commit
+```
+
 在取得簽核單資料後，可以使用 sign 方法來進行核准、駁回和加簽的作業。
 
 ```ruby
