@@ -23,8 +23,24 @@ module Larvata::Signing
     before_create :set_default_values
     before_save :set_signing_number
 
+    # 確認送簽
+    def commit
+      Larvata::Signing::Doc.transaction do
+        self.state = "signing"
+        self.save!
+
+        first_stage = self.stages.first
+        first_stage&.state = "signing"
+        first_stage&.save!
+
+        send_messages("signing", self.stages.first&.id)
+      end
+    end
+
     # 簽核邏輯：https://projects.larvata.tw/issues/70725
     def sign(current_user, signing_result, comment, opt = nil)
+      return self unless validate_doc_is_signing
+
       records = signing_records(signing_stage, current_user)
 
       send(signing_result, comment, records, opt)
@@ -198,21 +214,27 @@ module Larvata::Signing
 
     # 進入到下個階段
     def enter_next_stage(stage, opt = nil)
+      # 更新此階段狀態為已完成
+      stage.update_attributes!(state: "completed")
+
       if stage.is_last? # 最後階段
         # 讓resource_records 簽核單原始單據編號資料的狀態變為「決行」或是「封存」
         implement_resource_id = opt || resource_records.first&.id
-        resource_records.where(signing_resourceable_id: implement_resource_id).update_attributes!(state: "implement")
-        resource_records.where(state: "signing").update_attributes!(state: "archived")
+        resource_records.find_by(signing_resourceable_id: implement_resource_id).update_attributes!(state: "implement")
+        resource_records.where(state: "signing").update_all(state: "archived")
 
         # 依據「決行」或是「封存」來決定執行申請單據的 approved_method 和 implement_method 
         resource_records.each do |res_rec|
-          res_rec.signing_resouceable&.send(resource&.implement_method) if res_rec.implement?
-          res_rec.signing_resouceable&.send(resource&.approved_method) if res_rec.archived?
+          res_rec.signing_resourceable&.send(resource&.implement_method) if res_rec.implement?
+          res_rec.signing_resourceable&.send(resource&.approved_method) if res_rec.archived?
         end
-      else
-        # 更新此階段狀態為已完成
-        stage.update_attributes!(state: "completed")
 
+        # 更新此簽核單為已簽核
+        approved!
+
+        # 發送核准通知給申請人
+        send_messages('approve', stage.id)
+      else
         next_stage = stage.next_stage
 
         if next_stage.inform?
@@ -241,6 +263,11 @@ module Larvata::Signing
         # Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
         Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
       end
+    end
+
+    def validate_doc_is_signing
+      errors.add(:doc, I18n.t("labels.doc.cannot_sign_when_state_is_not_signing")) unless signing?
+      signing?
     end
   end
 end

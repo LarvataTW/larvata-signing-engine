@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :supervisor_stage, class: "Larvata::Signing::Stage" do
     typing { "sign" }
-    state { "signing" }
     seq { 1 }
 
     trait :with_supervisor do

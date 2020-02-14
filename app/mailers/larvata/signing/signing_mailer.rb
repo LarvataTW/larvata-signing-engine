@@ -13,7 +13,14 @@ module Larvata::Signing
     def reject(rec)
       @rec = rec
       @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
-      mail(to: rec.stage&.doc&.applicant&.email, subject: "您的#{rec.stage&.doc&.resource&.name}簽核單被駁回")
+      mail(to: rec.stage&.doc&.applicant&.email, subject: "您的#{rec.stage&.doc&.resource&.name}簽核單被駁回了")
+    end
+
+    # 駁回通知
+    def approve(rec)
+      @rec = rec
+      @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
+      mail(to: rec.stage&.doc&.applicant&.email, subject: "您的#{rec.stage&.doc&.resource&.name}簽核單被核准了")
     end
   end
 end

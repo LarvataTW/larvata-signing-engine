@@ -34,6 +34,7 @@ This setting will be used to generate doc page hyperlink of email, they can ente
 # @option opt [Integer] 
 #   如果是駁回，可以選擇退回的簽核階段編號。
 #   如果是加簽，需要傳入加簽人員編號。
+#   如果是最後一關的核准，可以傳入決行的單據編號，不傳的話就會抓取第一筆來做決行。
 doc.sign(current_user, signing_result, comment, opt)
 ```
 

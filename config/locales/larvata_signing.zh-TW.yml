@@ -3,6 +3,7 @@ zh-TW:
     doc:
       signing_records_not_found: 找不到簽核紀錄
       must_select_signer_for_waiting: 必須選擇加簽人員
+      cannot_sign_when_state_is_not_signing: 簽核單尚未確認送簽
   activerecord:
     models:
     attributes:
