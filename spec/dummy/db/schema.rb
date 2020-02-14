@@ -51,14 +51,14 @@ ActiveRecord::Schema.define(version: 20200210055307) do
   end
 
   create_table "larvata_signing_flow_members", force: :cascade do |t|
-    t.integer "dept_id", limit: 8
-    t.integer "user_id", limit: 8
+    t.integer "larvata_signing_flow_stage_id"
+    t.bigint "dept_id"
+    t.bigint "user_id"
     t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "larvata_signing_flow_stage_id"
     t.index ["dept_id"], name: "index_larvata_signing_flow_members_on_dept_id"
-    t.index ["larvata_signing_flow_stage_id"], name: "index_larvata_signing_flow_members_on_flow_stage_id"
+    t.index ["larvata_signing_flow_stage_id"], name: "index_larvata_signing_flow_memberds_on_flow_stage_id"
     t.index ["user_id"], name: "index_larvata_signing_flow_members_on_user_id"
   end
 

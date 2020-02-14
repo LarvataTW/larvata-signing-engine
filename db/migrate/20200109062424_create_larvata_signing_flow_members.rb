@@ -1,7 +1,7 @@
 class CreateLarvataSigningFlowMembers < ActiveRecord::Migration[5.1]
   def change
     create_table :larvata_signing_flow_members do |t|
-      t.references :larvata_signing_stage, foreign_key: true
+      t.references :larvata_signing_flow_stage, foreign_key: true, index: {name: 'index_larvata_signing_flow_memberds_on_flow_stage_id'}
       t.bigint :dept_id
       t.bigint :user_id
       t.string :role
