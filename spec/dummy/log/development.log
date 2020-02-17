@@ -2010,3 +2010,4 @@ Migrating to AddApplicantIdToLarvataSigningDoc (20200210055307)
             FROM sqlite_temp_master
             WHERE name='index_larvata_signing_todos_on_user_id' AND type='index'
 [0m
+  [1m[35mSQL (2.7ms)[0m  [1m[31mDELETE FROM "larvata_signing_todos"[0m

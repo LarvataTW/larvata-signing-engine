@@ -254,6 +254,7 @@ module Larvata::Signing
     end
 
     # 發送簽核通知
+    # @param typing [String] 通知類型：signing（簽核）、approve （核准）、reject（駁回）
     def send_messages(typing, stage_id = nil, record_id = nil)
       records = Larvata::Signing::Record.includes(:signer, stage: { doc: :resource })
       records = records.where(larvata_signing_stage_id: stage_id)
@@ -261,7 +262,9 @@ module Larvata::Signing
 
       records.each do |rec|
         # Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
-        Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
+
+        # for testing
+        Larvata::Signing::SigningMailer.send(typing, rec).deliver_now 
       end
     end
 
