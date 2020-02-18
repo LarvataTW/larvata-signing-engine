@@ -66,7 +66,7 @@ module Larvata::Signing
 
     # 抓取 current_user 以及其代理的人
     def signer_ids(current_user)
-      Larvata::Signing::Agent.agent_user_ids(current_user&.id) << current_user&.id
+      Larvata::Signing::Agent.agents_by(current_user&.id).pluck(:user_id) << current_user&.id
     end
 
     # 取得 current_user 以及其代理的人，對應的簽核紀錄
