@@ -7,7 +7,7 @@ module Larvata::Signing
       @rec = rec
       @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
       user = rec.signer
-      title = "有新的#{rec.stage&.doc&.resource&.name}簽核單需要簽核"
+      title = "「#{rec.stage&.doc&.title}」需要您簽核"
 
       create_todo!('signing_doc', user&.id, title, @admin_doc_url)
       mail(to: user.email, subject: title)
@@ -18,7 +18,7 @@ module Larvata::Signing
       @rec = rec
       @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
       user = rec.stage&.doc&.applicant
-      title = "您的#{rec.stage&.doc&.resource&.name}簽核單被駁回了"
+      title = "您的「#{rec.stage&.doc&.resource&.name}」簽核單被駁回了"
 
       create_todo!('notice', user&.id, title, @admin_doc_url)
       mail(to: user&.email, subject: title)
@@ -29,7 +29,7 @@ module Larvata::Signing
       @rec = rec
       @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
       user = rec.stage&.doc&.applicant
-      title = "您的#{rec.stage&.doc&.resource&.name}簽核單已核准了"
+      title = "您的「#{rec.stage&.doc&.resource&.name}」已核准了"
 
       create_todo!('notice', user&.id, title, @admin_doc_url)
       mail(to: user&.email, subject: title)

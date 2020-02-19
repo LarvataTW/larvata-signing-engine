@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :inquirement_doc, class: "Larvata::Signing::Doc" do
-    title { "詢價單簽核單" }
+    title { "森之驛-景觀工程詢價單" }
     remind_period { 24 }
     applicant_id { FactoryBot.create(:applicant_user) }
 
