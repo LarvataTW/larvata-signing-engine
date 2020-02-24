@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200224032636) do
+ActiveRecord::Schema.define(version: 20200224092548) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -93,6 +93,7 @@ ActiveRecord::Schema.define(version: 20200224032636) do
     t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deadline"
     t.index ["dept_id"], name: "index_larvata_signing_records_on_dept_id"
     t.index ["larvata_signing_stage_id"], name: "index_larvata_signing_records_on_larvata_signing_stage_id"
     t.index ["parent_record_id"], name: "index_larvata_signing_records_on_parent_record_id"
