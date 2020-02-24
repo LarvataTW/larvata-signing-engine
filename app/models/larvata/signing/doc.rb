@@ -48,6 +48,10 @@ module Larvata::Signing
       self.reload
     end
 
+    def self.states_i18n
+      states.inject({}) {|h, (k, v)|  h[k] = I18n.t("enums.doc.state.#{k}") || v; h}
+    end
+
     private 
 
     def set_default_values
