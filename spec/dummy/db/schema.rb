@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200210055307) do
+ActiveRecord::Schema.define(version: 20200224032636) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 20200210055307) do
     t.integer "larvata_signing_flow_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "label_method"
     t.index ["code"], name: "index_larvata_signing_resources_on_code"
     t.index ["larvata_signing_flow_id"], name: "index_larvata_signing_resources_on_larvata_signing_flow_id"
   end
