@@ -5,7 +5,7 @@ FactoryBot.define do
 
     trait :with_supervisor do
       after(:build) do |m|
-        m.records << FactoryBot.build(:supervisor_record)
+        m.srecords << FactoryBot.build(:supervisor_srecord)
       end
     end
   end
@@ -16,8 +16,8 @@ FactoryBot.define do
 
     trait :with_other_dept_managers do
       after(:build) do |m|
-        m.records << FactoryBot.build(:sales_manager_record)
-        m.records << FactoryBot.build(:construction_manager_record)
+        m.srecords << FactoryBot.build(:sales_manager_srecord)
+        m.srecords << FactoryBot.build(:construction_manager_srecord)
       end
     end
   end
@@ -28,7 +28,7 @@ FactoryBot.define do
 
     trait :with_president do
       after(:build) do |m|
-        m.records << FactoryBot.build(:president_record)
+        m.srecords << FactoryBot.build(:president_srecord)
       end
     end
   end

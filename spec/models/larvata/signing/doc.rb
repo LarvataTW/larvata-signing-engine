@@ -19,11 +19,11 @@ describe Larvata::Signing::Doc do
   let(:second_resource_record) { doc.resource_records.second }
   let(:third_resource_record) { doc.resource_records.third }
   let(:first_stage) { doc.stages.first }
-  let(:first_stage_records) { doc.stages.first.records }
+  let(:first_stage_srecords) { doc.stages.first.srecords }
   let(:second_stage) { doc.stages.second }
-  let(:second_stage_records) { doc.stages.second.records }
+  let(:second_stage_srecords) { doc.stages.second.srecords }
   let(:third_stage) { doc.stages.third }
-  let(:third_stage_records) { doc.stages.third.records }
+  let(:third_stage_srecords) { doc.stages.third.srecords }
   let(:todo_count) { Larvata::Signing::Todo.count }
 
   subject(:begin_signing) {
@@ -77,8 +77,8 @@ describe Larvata::Signing::Doc do
         doc.sign(supervisor, :approve, "pass")
 
         expect(first_stage.reload.completed?).to eq(true)
-        expect(first_stage_records.reload.first.state).to eq("signed")
-        expect(first_stage_records.reload.first.signing_result).to eq("approved")
+        expect(first_stage_srecords.reload.first.state).to eq("signed")
+        expect(first_stage_srecords.reload.first.signing_result).to eq("approved")
         expect(ActionMailer::Base.deliveries.count).to eq(2)
         expect(todo_count).to eq(2)
       end
@@ -87,8 +87,8 @@ describe Larvata::Signing::Doc do
         doc.sign(supervisor, :reject, "reject")
 
         expect(first_stage.reload.completed?).to eq(true)
-        expect(first_stage_records.first.reload.state).to eq("signed")
-        expect(first_stage_records.first.reload.signing_result).to eq("rejected")
+        expect(first_stage_srecords.first.reload.state).to eq("signed")
+        expect(first_stage_srecords.first.reload.signing_result).to eq("rejected")
         expect(first_resource_record.reload.state).to eq("rejected")
         expect(first_resource_record.signing_resourceable.reload.state).to eq("evaluated")
         expect(ActionMailer::Base.deliveries.count).to eq(1)
@@ -119,8 +119,8 @@ describe Larvata::Signing::Doc do
           doc.sign(sales_manager, :approve, "pass")
 
           expect(second_stage.reload.completed?).to eq(true)
-          expect(second_stage_records.second.reload.state).to eq("signed")
-          expect(second_stage_records.second.reload.signing_result).to eq("approved")
+          expect(second_stage_srecords.second.reload.state).to eq("signed")
+          expect(second_stage_srecords.second.reload.signing_result).to eq("approved")
           expect(ActionMailer::Base.deliveries.count).to eq(1)
           expect(todo_count).to eq(1)
         end
@@ -130,8 +130,8 @@ describe Larvata::Signing::Doc do
           doc.sign(sales_manager, :reject, "reject")
 
           expect(second_stage.reload.completed?).to eq(true)
-          expect(second_stage_records.first.reload.state).to eq("signed")
-          expect(second_stage_records.first.reload.signing_result).to eq("rejected")
+          expect(second_stage_srecords.first.reload.state).to eq("signed")
+          expect(second_stage_srecords.first.reload.signing_result).to eq("rejected")
           expect(second_resource_record.reload.state).to eq("rejected")
           expect(second_resource_record.signing_resourceable.reload.state).to eq("evaluated")
           expect(ActionMailer::Base.deliveries.count).to eq(1)
@@ -144,8 +144,8 @@ describe Larvata::Signing::Doc do
 
           expect(first_stage.reload.signing?).to eq(true)
           expect(second_stage.reload.pending?).to eq(true)
-          expect(first_stage_records.reload.count).to eq(2)
-          expect(second_stage_records.reload.count).to eq(4)
+          expect(first_stage_srecords.reload.count).to eq(2)
+          expect(second_stage_srecords.reload.count).to eq(4)
           expect(ActionMailer::Base.deliveries.count).to eq(2)
           expect(todo_count).to eq(2)
         end
@@ -157,11 +157,11 @@ describe Larvata::Signing::Doc do
             doc
           }
 
-          it "financial_manager signing record created" do 
+          it "financial_manager signing srecord created" do 
             waiting_for_financial_manager_signing
 
-            expect(second_stage_records.reload.count).to eq(3)
-            expect(second_stage_records.last.reload.signer_id).to eq(financial_manager.id)
+            expect(second_stage_srecords.reload.count).to eq(3)
+            expect(second_stage_srecords.last.reload.signer_id).to eq(financial_manager.id)
             expect(ActionMailer::Base.deliveries.count).to eq(1)
             expect(todo_count).to eq(1)
           end
@@ -173,8 +173,8 @@ describe Larvata::Signing::Doc do
 
             doc.sign(financial_manager, :approve, "pass")
 
-            expect(second_stage_records.reload.count).to eq(4)
-            expect(second_stage_records.last.reload.signer_id).to eq(sales_manager.id)
+            expect(second_stage_srecords.reload.count).to eq(4)
+            expect(second_stage_srecords.last.reload.signer_id).to eq(sales_manager.id)
             expect(ActionMailer::Base.deliveries.count).to eq(1)
             expect(todo_count).to eq(1)
           end
@@ -187,8 +187,8 @@ describe Larvata::Signing::Doc do
             doc.sign(financial_manager, :reject, "reject")
 
             expect(second_stage.reload.completed?).to eq(true)
-            expect(second_stage_records.last.reload.state).to eq("signed")
-            expect(second_stage_records.last.reload.signing_result).to eq("rejected")
+            expect(second_stage_srecords.last.reload.state).to eq("signed")
+            expect(second_stage_srecords.last.reload.signing_result).to eq("rejected")
             expect(first_resource_record.reload.state).to eq("rejected")
             expect(first_resource_record.signing_resourceable.reload.state).to eq("evaluated")
             expect(ActionMailer::Base.deliveries.count).to eq(1)

@@ -16,7 +16,7 @@ module Larvata::Signing
 
         unless flow_stage.supervisor_sign?
           flow_stage.flow_members.each do |flow_member|
-            stage.records.build(flow_member.attributes.slice("dept_id", "role").merge({"signer_id" => flow_member.user_id}))
+            stage.srecords.build(flow_member.attributes.slice("dept_id", "role").merge({"signer_id" => flow_member.user_id}))
           end
         else
           # TBD 建立主管簽核資料
