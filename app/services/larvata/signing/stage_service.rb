@@ -25,6 +25,13 @@ module Larvata
       def has_not_yet_signed
         srecords.where(signing_result: nil)
       end
+
+      private
+
+      def set_default_values
+        self.countersign ||= false
+        self.state ||= "pending"
+      end
     end
   end
 end

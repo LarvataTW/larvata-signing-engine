@@ -15,16 +15,5 @@ module Larvata::Signing
       foreign_key: "larvata_signing_stage_id", inverse_of: :stage, dependent: :destroy
 
     before_create :set_default_values
-
-    def self.typings_i18n
-      typings.inject({}) {|h, (k, v)|  h[k] = I18n.t("enums.stage.typing.#{k}") || v; h}
-    end
-
-    private
-
-    def set_default_values
-      self.countersign ||= false
-      self.state ||= "pending"
-    end
   end
 end

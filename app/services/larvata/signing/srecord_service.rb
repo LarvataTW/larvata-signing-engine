@@ -12,6 +12,12 @@ module Larvata
           rec
         end
       end
+
+      private
+
+      def set_default_values
+        self.state ||= "pending"
+      end
     end
   end
 end

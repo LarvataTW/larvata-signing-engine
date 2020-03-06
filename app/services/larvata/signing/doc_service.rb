@@ -215,16 +215,30 @@ module Larvata
         srecords = srecords.where(id: srecord_id) unless srecord_id.nil?
 
         srecords.each do |rec|
-          # Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
-
-          # for testing
-          Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
+          if Rails.env == 'production'
+            Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
+          else
+            Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
+          end
         end
       end
 
       def validate_doc_is_signing
         errors.add(:doc, I18n.t("labels.doc.cannot_sign_when_state_is_not_signing")) unless signing?
         signing?
+      end
+
+      private
+
+      def set_default_values
+        self.state ||= "draft"
+      end
+
+      def set_signing_number
+        if signing_number.blank?
+          docs_of_today = self.class.where(created_at: Time.current.midnight..Time.current.end_of_day)
+          self.signing_number = "#{Time.current.strftime("%Y%m%d")}#{(docs_of_today.count+1).to_s.rjust(3, '0')}"
+        end
       end
     end
   end

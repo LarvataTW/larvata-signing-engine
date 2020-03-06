@@ -1,5 +1,7 @@
 module Larvata::Signing
   class Srecord < ApplicationRecord
+    include Larvata::Signing::SrecordService
+
     self.table_name = "larvata_signing_records"
 
     SIGNING_RESULTS = [:waiting, :rejected, :approved]
@@ -17,11 +19,5 @@ module Larvata::Signing
     belongs_to :signer, foreign_key: "signer_id", class_name: "User", optional: true
 
     before_create :set_default_values 
-
-    private
-
-    def set_default_values
-      self.state ||= "pending"
-    end
   end
 end
