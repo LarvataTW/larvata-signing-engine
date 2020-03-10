@@ -2,7 +2,7 @@ module Larvata
   module Signing
     module DocService
       # 確認送簽
-      def commit
+      def commit!
         Larvata::Signing::Doc.transaction do
           self.state = "signing"
           self.save!
@@ -10,6 +10,8 @@ module Larvata
           first_stage = self.stages.first
           first_stage&.state = "signing"
           first_stage&.save!
+
+          resource_records.update_all(state: 'signing')
 
           send_messages("signing", self.stages.first&.id)
         end

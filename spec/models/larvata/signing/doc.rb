@@ -27,7 +27,7 @@ describe Larvata::Signing::Doc do
   let(:todo_count) { Larvata::Signing::Todo.count }
 
   subject(:begin_signing) {
-    doc.commit
+    doc.commit!
   }
 
   before {
@@ -47,7 +47,7 @@ describe Larvata::Signing::Doc do
     end
   end
 
-  describe "#commit" do
+  describe "#commit!" do
     it "begin signing" do
       begin_signing
 
@@ -105,7 +105,7 @@ describe Larvata::Signing::Doc do
     context "in the second stage" do 
       context "when construction_manager approve" do 
         subject(:doc_with_second_stage_signing_and_construction_manager_approved) { 
-          doc.commit
+          doc.commit!
           doc.sign(supervisor, :approve, "pass")
           doc.sign(construction_manager, :approve, "pass")
 
@@ -200,7 +200,7 @@ describe Larvata::Signing::Doc do
 
     context "in the third stage" do
       subject(:doc_with_third_stage_signing) { 
-        doc.commit
+        doc.commit!
         doc.sign(supervisor, :approve, "pass")
         doc.sign(construction_manager, :approve, "pass")
         doc.sign(sales_manager, :approve, "pass")

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    larvata-signing (0.3.6)
+    larvata-signing (0.3.7)
       rails (>= 5.1.4)
 
 GEM
@@ -173,4 +173,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
