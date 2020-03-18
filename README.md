@@ -16,6 +16,16 @@ And then execute:
 $ bundle
 ```
 
+Update the Larvata signing module migrations:
+```bash
+$ rails larvata_signing:install:migrations
+```
+
+And then execute:
+```bash
+$ rails g db:migrate
+```
+
 ## Setting
 
 Create an new file called `larvata_signing.rb`, this file is located at ``/config/initializers/larvata_signing.rb`.

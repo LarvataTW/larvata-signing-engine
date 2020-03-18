@@ -13,6 +13,13 @@ module Larvata
         end
       end
 
+      # 判斷傳入使用者是否可以簽核
+      def signable?(current_user)
+        doc = stage&.doc
+        recs = doc.send( :signing_srecords, stage, current_user )
+        recs.any?
+      end
+
       private
 
       def set_default_values

@@ -40,6 +40,7 @@ module Larvata
         Larvata::Signing::Agent.agents_by(current_user&.id).pluck(:user_id) << current_user&.id
       end
 
+      # 可用來判斷 current_user 是否可以簽核
       # 取得 current_user 以及其代理的人，對應的簽核紀錄
       def signing_srecords(stage, current_user)
         signer_ids = signer_ids(current_user)
