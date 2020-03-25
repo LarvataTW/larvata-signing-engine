@@ -18,7 +18,7 @@ module Larvata
       end
 
       # 簽核邏輯：https://projects.larvata.tw/issues/70725
-      def sign(current_user, signing_result, comment, opt = nil)
+      def sign(current_user, signing_result, comment, **opt)
         return self unless validate_doc_is_signing
 
         srecords = signing_srecords(signing_stage, current_user)
@@ -55,8 +55,11 @@ module Larvata
       #     進到下一個階段或是讓申請單據簽核狀態變為核准
       #   如果此階段是會簽
       #     如果其他人也是核准，則進到下一個階段或是讓申請單據簽核狀態變為核准
-      #   最後，如果此階段為最後一關，則需要從 opt* 抓取參數值，來決定哪一個是決行的單據
-      def approve(comment, srecords, opt = nil)
+      #   最後，如果此階段為最後一關，則需要從 opt 抓取參數值，來決定哪一個是決行的單據
+      # 核准加簽
+      # @param string opt[:waiting_stage_typing] 要加簽的簽核階段類型（串簽、會簽、擇辦）
+      # @param string opt[:waiting_signer_ids] 要加簽的簽核人員，多筆以逗點分隔
+      def approve(comment, srecords, **opt)
         Larvata::Signing::Srecord.transaction do
           srecords&.each do |rec|
             rec.state = "signed"
@@ -64,7 +67,10 @@ module Larvata
             rec.comment = comment
             rec.save!
 
+            generate_waiting_stage(rec, **opt)
+
             if can_enter_next_stage?(rec) # 是否可進入到下個階段
+              complete_waiting_stage(rec.stage)
               enter_next_stage(rec.stage, opt)
             end
           end
@@ -73,7 +79,8 @@ module Larvata
 
       # 駁回
       #   需要從 opt 抓取參數值，來決定回到哪一個簽核階段
-      def reject(comment, srecords, opt = nil)
+      # @param integer opt[:return_stage_seq] 要回到哪個階段的 seq
+      def reject(comment, srecords, **opt)
         Larvata::Signing::Srecord.transaction do
           srecords&.each do |rec|
             stage = rec.stage
@@ -83,7 +90,7 @@ module Larvata
             rec.comment = comment
             rec.save!
 
-            if stage.is_first? or opt.nil? # 退回到申請人
+            if stage.is_first? or opt.empty? # 退回到申請人
               # 駁回的階段狀態變為已完成
               stage.state = "completed"
               stage.save!
@@ -98,23 +105,26 @@ module Larvata
 
               # 發送駁回通知給申請人員
               send_messages('reject', stage.id, rec.id)
-            elsif opt.present? # 退回到指定階段
-              reset_stages = stages.includes(:srecords).where("seq >= ? and seq <= ?", opt, stage&.seq)
-              reset_stages.each_with_index do |s, index|
+            elsif opt[:return_stage_seq].present? # 退回到指定階段
+              reset_stages = stages.includes(:srecords)
+                .where("seq >= ? and seq <= ?", opt[:return_stage_seq], stage&.seq)
+                .order(:seq)
+
+              reset_stages.each_with_index do |_stage, index|
                 # 原本還尚未簽核的紀錄，會變為「中止」
-                s.srecords.where(signing_result: nil).update_all(state: 'terminated')
+                _stage.srecords.where(signing_result: nil).update_all(state: 'terminated')
 
                 # 會把「退回階段」到「退簽階段」之間所有簽核資料，往原本的階段再額外建立一整組空白紀錄，然後開始簽核。
-                signers = s.srecords.map{ |r| r.attributes.slice("signer_id", "dept_id", "role") }.uniq
-                s.srecords.create!(signers)
+                signers = _stage.srecords.map{ |r| r.attributes.slice("signer_id", "dept_id", "role") }.uniq
+                _stage.srecords.create!(signers)
 
                 if index == 0
-                  s.signing!
+                  _stage.signing!
 
                   # 發送簽核通知給申請人員
-                  send_messages('signing', s.id)
+                  send_messages('signing', _stage.id)
                 else
-                  s.pending!
+                  _stage.pending!
                 end
               end
             end
@@ -122,10 +132,32 @@ module Larvata
         end
       end
 
-      # 加簽
+      # 核准加簽
+      def generate_waiting_stage(rec, **opt)
+        Larvata::Signing::Srecord.transaction do
+          if opt[:waiting_stage_typing].present? and opt[:waiting_signer_ids].present?
+            # 建立加簽階段，並且設定此階段狀態為 signing
+            new_stage = Stage.create(larvata_signing_doc_id: rec.stage&.doc&.id, 
+                                     typing: opt[:waiting_stage_typing], 
+                                     parent_record_id: rec.id, 
+                                     state: 'pending')
+
+            new_stage.append_to!(rec.stage)
+
+            # 建立加簽人員的簽核紀錄
+            opt[:waiting_signer_ids]&.split(',').each do |signer_id|
+              new_stage.srecords.create(signer_id: signer_id, dept_id: nil, role: nil, parent_record_id: rec.id)
+            end
+          end
+        end
+      end
+
+      # 未決加簽
       #   需要抓取 opt 的參數值，來建立一個新的簽核紀錄給加簽人員並發送通知
-      def waiting(comment, srecords, opt = nil)
-        if opt.nil?
+      # @param string opt[:waiting_stage_typing] 要加簽的簽核階段類型（串簽、會簽、擇辦）
+      # @param string opt[:waiting_signer_ids] 要加簽的簽核人員，多筆以逗點分隔
+      def wait(comment, srecords, **opt)
+        if opt.empty?
           errors.add(:doc, I18n.t('labels.doc.must_select_signer_for_waiting'))
           return
         end
@@ -137,26 +169,36 @@ module Larvata
             rec.comment = comment
             rec.save!
 
-            # 建立加簽人員的簽核紀錄
-            rec.stage.srecords.create(signer_id: opt, dept_id: nil, role: nil, parent_record_id: rec.id)
+            # 將目前階段狀態設定為 pending
+            current_stage = rec.stage
+            current_stage.state = 'pending'
+            current_stage.save!
 
-            # TBD 發送簽核通知給加簽人員
-            send_messages('signing', rec.stage.id, rec.id)
+            # 建立加簽階段，並且設定此階段狀態為 signing
+            new_stage = Stage.create(larvata_signing_doc_id: rec.stage&.doc&.id, 
+                                  typing: opt[:waiting_stage_typing], 
+                                  parent_record_id: rec.id, 
+                                  state: 'signing')
+
+            new_stage.append_to!(rec.stage)
+
+            # 建立加簽人員的簽核紀錄
+            opt[:waiting_signer_ids].split(',').each do |signer_id|
+              new_rec = new_stage.srecords.create(signer_id: signer_id, dept_id: nil, role: nil, parent_record_id: rec.id)
+
+              # 發送簽核通知給加簽人員
+              send_messages('signing', new_stage.id, new_rec.id)
+            end
           end
         end
       end
 
       # 判斷是否可以進入到下個階段
+      # 如果可以進入下個階段，且目前階段為未決加簽，就會建立一個新的簽核紀錄給原簽核人員
       def can_enter_next_stage?(rec)
         stage = rec.stage
-        if rec.parent_record_id.present? # 加簽
-          # 建立一個新的簽核紀錄給原簽核人員
-          parent_rec = Larvata::Signing::Srecord.find_by(id: rec.parent_record_id)
-          new_rec = Larvata::Signing::SrecordService.create_srecord_and_send_message!(parent_rec&.larvata_signing_stage_id, parent_rec&.signer_id)
 
-          # 發送簽核通知給原簽核人員
-          send_messages('signing', rec.stage.id, new_rec&.id)
-        elsif stage.sign? or stage.any_supervisor? # 串簽 or 擇辦
+        if stage.sign? or stage.any_supervisor? # 串簽 or 擇辦
           # 進到下一個階段或是讓申請單據簽核狀態變為核准
           can_enter_next_stage = true
         elsif stage.counter_sign? # 會簽
@@ -169,15 +211,27 @@ module Larvata
         can_enter_next_stage
       end
 
+      # 未決加簽階段在核准可進入下一關時，要將簽核流程回到指定者
+      def complete_waiting_stage(stage)
+        parent_record = Larvata::Signing::Srecord.includes(:stage).find_by_id(stage.parent_record_id)
+        if parent_record&.waiting?
+          # 建立一個新的簽核紀錄給原簽核人員
+          Larvata::Signing::SrecordService
+            .create_srecord_and_send_message!(parent_record&.larvata_signing_stage_id, 
+                                              parent_record&.signer_id)
+        end
+      end
+
       # 進入到下個階段
-      def enter_next_stage(stage, opt = nil)
+      # @param integer opt[:implement_resource_record_id] 決行的單據 ID
+      def enter_next_stage(stage, **opt)
         # 更新此階段狀態為已完成
         stage.update_attributes!(state: "completed")
 
         if stage.is_last? # 最後階段
           # 讓resource_records 簽核單原始單據編號資料的狀態變為「決行」或是「封存」
-          implement_resource_id = opt || resource_records.first&.id
-          resource_records.find_by(signing_resourceable_id: implement_resource_id).update_attributes!(state: "implement")
+          implement_resource_record_id = opt[:implement_resource_record_id] || resource_records.first&.id
+          resource_records.find_by(signing_resourceable_id: implement_resource_record_id).update_attributes!(state: "implement")
           resource_records.where(state: "signing").update_all(state: "archived")
 
           # 依據「決行」或是「封存」來決定執行申請單據的 approved_method 和 implement_method
@@ -213,8 +267,10 @@ module Larvata
       # 發送簽核通知
       # @param typing [String] 通知類型：signing（簽核）、approve （核准）、reject（駁回）
       def send_messages(typing, stage_id = nil, srecord_id = nil)
-        srecords = Larvata::Signing::Srecord.includes(:signer, stage: { doc: :resource })
-        srecords = srecords.where(larvata_signing_stage_id: stage_id)
+        srecords = Larvata::Signing::Srecord
+          .includes(:signer, stage: { doc: :resource })
+          .where(larvata_signing_stage_id: stage_id)
+        srecords = srecords.where(state: 'pending') if typing == 'signing'
         srecords = srecords.where(id: srecord_id) unless srecord_id.nil?
 
         srecords.each do |rec|

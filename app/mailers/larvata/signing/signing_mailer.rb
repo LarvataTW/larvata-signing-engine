@@ -16,9 +16,10 @@ module Larvata::Signing
     # 駁回通知
     def reject(rec)
       @rec = rec
-      @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
-      user = rec.stage&.doc&.applicant
-      title = "您的「#{rec.stage&.doc&.resource&.name}」簽核單被駁回了"
+      doc = rec.stage&.doc
+      @admin_doc_url = send(Larvata::Signing.admin_doc_url, doc&.id)
+      user = doc&.applicant
+      title = "您的「#{doc&.title}」簽核單被駁回了"
 
       create_todo!('notice', user&.id, title, @admin_doc_url)
       mail(to: user&.email, subject: title)
@@ -27,9 +28,10 @@ module Larvata::Signing
     # 核准通知
     def approve(rec)
       @rec = rec
-      @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
-      user = rec.stage&.doc&.applicant
-      title = "您的「#{rec.stage&.doc&.resource&.name}」已核准了"
+      doc = rec.stage&.doc
+      @admin_doc_url = send(Larvata::Signing.admin_doc_url, doc&.id)
+      user = doc&.applicant
+      title = "您的「#{doc&.title}」已核准了"
 
       create_todo!('notice', user&.id, title, @admin_doc_url)
       mail(to: user&.email, subject: title)
