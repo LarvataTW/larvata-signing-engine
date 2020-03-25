@@ -16,6 +16,16 @@ And then execute:
 $ bundle
 ```
 
+Update the Larvata signing module migrations:
+```bash
+$ rails larvata_signing:install:migrations
+```
+
+And then execute:
+```bash
+$ rails g db:migrate
+```
+
 ## Setting
 
 Create an new file called `larvata_signing.rb`, this file is located at ``/config/initializers/larvata_signing.rb`.
@@ -36,7 +46,7 @@ doc.commit
 
 ```ruby
 # @param current_user [User] 目前簽核的使用者
-# @param signing_result [Symbol] 簽核結果分別有三種：:approve 核准、:reject 駁回、:waiting 加簽
+# @param signing_result [Symbol] 簽核結果分別有三種：:approve 核准、:reject 駁回、:wait 加簽
 # @param comment [String] 簽核意見
 # @option opt [Integer] 
 #   如果是駁回，可以選擇退回的簽核階段編號。

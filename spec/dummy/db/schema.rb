@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200224092548) do
+ActiveRecord::Schema.define(version: 20200325025750) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -93,7 +93,8 @@ ActiveRecord::Schema.define(version: 20200224092548) do
     t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deadline"
+    t.text "waiting_reason"
+    t.bigint "implement_id"
     t.index ["dept_id"], name: "index_larvata_signing_records_on_dept_id"
     t.index ["larvata_signing_stage_id"], name: "index_larvata_signing_records_on_larvata_signing_stage_id"
     t.index ["parent_record_id"], name: "index_larvata_signing_records_on_parent_record_id"
@@ -135,11 +136,12 @@ ActiveRecord::Schema.define(version: 20200224092548) do
     t.integer "larvata_signing_doc_id"
     t.integer "typing"
     t.integer "seq"
-    t.boolean "countersign"
     t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "parent_record_id"
     t.index ["larvata_signing_doc_id"], name: "index_larvata_signing_stages_on_larvata_signing_doc_id"
+    t.index ["parent_record_id"], name: "index_larvata_signing_stages_on_parent_record_id"
     t.index ["state"], name: "index_larvata_signing_stages_on_state"
     t.index ["typing"], name: "index_larvata_signing_stages_on_typing"
   end

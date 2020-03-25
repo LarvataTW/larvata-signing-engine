@@ -18,7 +18,7 @@ module Larvata::Signing
     has_many :stages, -> { order "seq ASC" }, class_name: "Larvata::Signing::Stage", 
       foreign_key: "larvata_signing_doc_id", dependent: :destroy
 
-    has_many :srecords, class_name: "Larvata::Signing::Srecord", through: :stages, dependent: :destroy
+    has_many :srecords, class_name: "Larvata::Signing::Srecord", through: :stages
 
     belongs_to :applicant, foreign_key: "applicant_id", class_name: "User", optional: true
 
