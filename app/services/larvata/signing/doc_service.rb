@@ -59,12 +59,14 @@ module Larvata
       # 核准加簽
       # @param string opt[:waiting_stage_typing] 要加簽的簽核階段類型（串簽、會簽、擇辦）
       # @param string opt[:waiting_signer_ids] 要加簽的簽核人員，多筆以逗點分隔
+      # @param integer opt[:implement_resource_record_id] 決行的單據 ID
       def approve(comment, srecords, **opt)
         Larvata::Signing::Srecord.transaction do
           srecords&.each do |rec|
             rec.state = "signed"
             rec.signing_result = "approved"
             rec.comment = comment
+            rec.implement_id = opt[:implement_resource_record_id]
             rec.save!
 
             generate_waiting_stage(rec, **opt)
