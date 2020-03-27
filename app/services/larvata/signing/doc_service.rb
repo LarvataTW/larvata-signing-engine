@@ -5,6 +5,7 @@ module Larvata
       def commit!
         Larvata::Signing::Doc.transaction do
           self.state = "signing"
+          self.committed_at = Time.current
           self.save!
 
           first_stage = self.stages.first
