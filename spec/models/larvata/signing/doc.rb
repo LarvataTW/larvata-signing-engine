@@ -252,6 +252,7 @@ describe Larvata::Signing::Doc do
         expect(doc.state).to eq("approved")
         expect(first_resource_record.reload.state).to eq("implement")
         expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect(doc.srecords.last.implement_id).to eq(first_resource_record.signing_resourceable.id)
         expect(todo_count).to eq(1)
       end
     end
