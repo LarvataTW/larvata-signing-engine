@@ -14,6 +14,12 @@ module Larvata
 
           resource_records.update_all(state: 'signing')
 
+          # 更新原始單據狀態
+          resource_records.each do |res_rec|
+            _form_data = res_rec.signing_resourceable
+            _form_data&.send(state: 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present?
+          end
+
           send_messages("signing", self.stages.first&.id)
         end
       end
@@ -233,7 +239,8 @@ module Larvata
 
         if stage.is_last? # 最後階段
           # 讓resource_records 簽核單原始單據編號資料的狀態變為「決行」或是「封存」
-          implement_resource_record_id = opt[:implement_resource_record_id] || resource_records.first&.id
+          implement_resource_record_id = opt[:implement_resource_record_id] 
+          implement_resource_record_id = resource_records.first&.id if implement_resource_record_id.blank?
           resource_records.find_by(signing_resourceable_id: implement_resource_record_id).update_attributes!(state: "implement")
           resource_records.where(state: "signing").update_all(state: "archived")
 
