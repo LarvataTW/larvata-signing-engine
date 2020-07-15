@@ -3,7 +3,7 @@ module Larvata::Signing
     include Larvata::Signing::StageService
 
     TYPINGS = [:sign, :counter_sign, :any_supervisor, :inform]
-    STATES = [:pending, :signing, :completed]
+    STATES = [:pending, :signing, :completed, :terminated]
 
     enum typing: TYPINGS
     enum state: STATES
