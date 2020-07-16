@@ -17,7 +17,7 @@ module Larvata
           # 更新原始單據狀態
           resource_records.each do |res_rec|
             _form_data = res_rec.signing_resourceable
-            _form_data&.send(state: 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present?
+            _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present?
           end
 
           send_messages("signing", self.stages.first&.id)
@@ -233,15 +233,20 @@ module Larvata
 
         if stage.is_last? # 最後階段
           # 讓resource_records 簽核單原始單據編號資料的狀態變為「決行」或是「封存」
-          implement_resource_record_id = opt[:implement_resource_record_id] 
-          implement_resource_record_id = resource_records.first&.id if implement_resource_record_id.blank?
-          resource_records.find_by(signing_resourceable_id: implement_resource_record_id).update_attributes!(state: "implement")
-          resource_records.where(state: "signing").update_all(state: "archived")
-
           # 依據「決行」或是「封存」來決定執行申請單據的 approved_method 和 implement_method
-          resource_records.each do |res_rec|
-            res_rec.signing_resourceable&.send(resource&.implement_method) if res_rec.implement?
-            res_rec.signing_resourceable&.send(resource&.approved_method) if res_rec.archived?
+          implement_resource_record_id = opt[:implement_resource_record_id]
+          if implement_resource_record_id.blank?
+            implement_resource_record = resource_records.find_by(id: resource_records.first&.id)
+          else
+            implement_resource_record = resource_records.find_by(signing_resourceable_id: implement_resource_record_id)
+          end
+          implement_resource_record.update_attributes!(state: "implement")
+          implement_resource_record.signing_resourceable.send(resource&.implement_method)
+
+          # 剩下未決行的封存起來
+          resource_records.where(state: "signing").each do |res_rec|
+            res_rec.signing_resourceable&.send(resource&.approved_method)
+            res_rec.update_column("state", "archived")
           end
 
           # 更新此簽核單為已簽核
