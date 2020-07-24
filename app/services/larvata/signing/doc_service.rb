@@ -35,6 +35,29 @@ module Larvata
         self.reload
       end
 
+      # 中止
+      def terminate
+        rejected!
+        signing_stage&.terminated!
+        rejection_of_resource_records(resource_records)
+      end
+
+      # 作廢簽核單
+      def obsolete
+        void!
+        rejection_of_resource_records(resource_records)
+      end
+
+      def rejection_of_resource_records(resource_records)
+        # 讓resource_records 簽核單原始單據編號資料的狀態變為「駁回」
+        resource_records.update_all(state: "rejected")
+
+        # 執行申請單據的 return_method
+        resource_records.each do |res_rec|
+          res_rec.signing_resourceable&.send(resource&.returned_method)
+        end
+      end
+
       private
 
       # 目前需要簽核的階段
@@ -295,31 +318,6 @@ module Larvata
         errors.add(:doc, I18n.t("labels.doc.cannot_sign_when_state_is_not_signing")) unless signing?
         signing?
       end
-
-      # 中止
-      def terminate
-        reject!
-        signing_stage.terminated!
-        rejection_of_resource_records(resource_records)
-      end
-
-      # 作廢簽核單
-      def obsolete
-        void!
-        rejection_of_resource_records(resource_records)
-      end
-
-      def rejection_of_resource_records(resource_records)
-        # 讓resource_records 簽核單原始單據編號資料的狀態變為「駁回」
-        resource_records.update_all(state: "rejected")
-
-        # 執行申請單據的 return_method
-        resource_records.each do |res_rec|
-          res_rec.signing_resourceable&.send(resource&.returned_method)
-        end
-      end
-
-      private
 
       def set_default_values
         self.state ||= "draft"
