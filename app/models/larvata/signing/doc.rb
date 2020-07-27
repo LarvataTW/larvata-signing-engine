@@ -22,6 +22,9 @@ module Larvata::Signing
 
     belongs_to :applicant, foreign_key: "applicant_id", class_name: "User", optional: true
 
+    validates_presence_of :stages
+    validates_presence_of :srecords
+
     before_create :set_default_values
     before_save :set_signing_number
   end
