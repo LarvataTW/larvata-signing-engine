@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200724021630) do
+ActiveRecord::Schema.define(version: 20200812060039) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -58,6 +58,8 @@ ActiveRecord::Schema.define(version: 20200724021630) do
     t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "com_id"
+    t.index ["com_id"], name: "index_larvata_signing_flow_members_on_com_id"
     t.index ["dept_id"], name: "index_larvata_signing_flow_members_on_dept_id"
     t.index ["larvata_signing_flow_stage_id"], name: "index_larvata_signing_flow_memberds_on_flow_stage_id"
     t.index ["user_id"], name: "index_larvata_signing_flow_members_on_user_id"
@@ -96,6 +98,8 @@ ActiveRecord::Schema.define(version: 20200724021630) do
     t.datetime "updated_at", null: false
     t.text "waiting_reason"
     t.bigint "implement_id"
+    t.bigint "com_id"
+    t.index ["com_id"], name: "index_larvata_signing_records_on_com_id"
     t.index ["dept_id"], name: "index_larvata_signing_records_on_dept_id"
     t.index ["larvata_signing_stage_id"], name: "index_larvata_signing_records_on_larvata_signing_stage_id"
     t.index ["parent_record_id"], name: "index_larvata_signing_records_on_parent_record_id"
