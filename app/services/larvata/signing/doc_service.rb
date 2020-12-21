@@ -42,10 +42,20 @@ module Larvata
         rejection_of_resource_records(resource_records)
       end
 
-      # 作廢簽核單
+      # 作廢
       def obsolete
         void!
         rejection_of_resource_records(resource_records)
+      end
+
+      # 重啟
+      def resume
+        if stages.last.completed? and stages.last.srecords.exists?(state: 'signed') # 原狀態是核准
+          resource_records.rejected.each do |res|
+            res.update_column(:state, 'implement')
+            res.signing_resourceable.send(resource&.implement_method)
+          end
+        end
       end
 
       def rejection_of_resource_records(resource_records)
