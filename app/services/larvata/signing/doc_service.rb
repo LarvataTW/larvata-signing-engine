@@ -51,6 +51,7 @@ module Larvata
       # 重啟
       def resume
         if stages.last.completed? and stages.last.srecords.exists?(state: 'signed') # 原狀態是核准
+          approved!
           resource_records.rejected.each do |res|
             res.update_column(:state, 'implement')
             res.signing_resourceable.send(resource&.implement_method)
