@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200812060039) do
+ActiveRecord::Schema.define(version: 20210520032851) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20200812060039) do
     t.text "waiting_reason"
     t.bigint "implement_id"
     t.bigint "com_id"
+    t.datetime "deadline"
     t.index ["com_id"], name: "index_larvata_signing_records_on_com_id"
     t.index ["dept_id"], name: "index_larvata_signing_records_on_dept_id"
     t.index ["larvata_signing_stage_id"], name: "index_larvata_signing_records_on_larvata_signing_stage_id"
