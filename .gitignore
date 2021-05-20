@@ -9,4 +9,4 @@ test/dummy/tmp/
 tags
 .ruby-version
 .rbenv-gemsets
-.idea
+.idea/
