@@ -11,7 +11,7 @@ module Larvata
     @@admin_search_doc_url = 'admin_search_doc_url'
 
     # 審批簽呈資料
-    mattr_accessor :admin_singing_doc_url
-    @@admin_singing_doc_url = 'admin_singing_doc_url'
+    mattr_accessor :admin_signing_doc_url
+    @@admin_signing_doc_url = 'admin_signing_doc_url'
   end
 end

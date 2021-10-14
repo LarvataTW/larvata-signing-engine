@@ -5,7 +5,7 @@ module Larvata::Signing
     # 簽核通知
     def signing(rec)
       @rec = rec
-      @admin_signing_doc_url = send(Larvata::Signing.admin_singing_doc_url, @rec.stage&.doc&.id)
+      @admin_signing_doc_url = send(Larvata::Signing.admin_signing_doc_url, @rec.stage&.doc&.id)
       user = rec.signer
       title = "「#{rec.stage&.doc&.title}」需要您簽核"
 
