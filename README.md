@@ -31,6 +31,8 @@ $ rails g db:migrate
 Create an new file called `larvata_signing.rb`, this file is located at ``/config/initializers/larvata_signing.rb`.
 If your app has `admin/docs` pages to manage signing data, you can add the setting with:
     Larvata::Signing.admin_doc_url = "admin_doc_url"
+    Larvata::Signing.admin_search_doc_url = "admin_search_doc_url"
+    Larvata::Signing.admin_singing_doc_url = "admin_singing_doc_url"
 This setting will be used to generate doc page hyperlink of email, they can enter doc page very soon via hyperlink of email.
 
 ## Usage
