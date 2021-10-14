@@ -5,11 +5,11 @@ module Larvata::Signing
     # 簽核通知
     def signing(rec)
       @rec = rec
-      @admin_doc_url = send(Larvata::Signing.admin_doc_url, @rec.stage&.doc&.id)
+      @admin_signing_doc_url = send(Larvata::Signing.admin_singing_doc_url, @rec.stage&.doc&.id)
       user = rec.signer
       title = "「#{rec.stage&.doc&.title}」需要您簽核"
 
-      create_todo!('signing_doc', user&.id, title, @admin_doc_url)
+      create_todo!('signing_doc', user&.id, title, @admin_signing_doc_url)
       mail(to: user.email, subject: title)
     end
 
@@ -17,11 +17,11 @@ module Larvata::Signing
     def reject(rec)
       @rec = rec
       doc = rec.stage&.doc
-      @admin_doc_url = send(Larvata::Signing.admin_doc_url, doc&.id)
+      @admin_search_doc_url = send(Larvata::Signing.admin_search_doc_url, doc&.id)
       user = doc&.applicant
       title = "您的「#{doc&.title}」簽核單被駁回了"
 
-      create_todo!('notice', user&.id, title, @admin_doc_url)
+      create_todo!('notice', user&.id, title, @admin_search_doc_url)
       mail(to: user&.email, subject: title)
     end
 
@@ -29,11 +29,11 @@ module Larvata::Signing
     def approve(rec)
       @rec = rec
       doc = rec.stage&.doc
-      @admin_doc_url = send(Larvata::Signing.admin_doc_url, doc&.id)
+      @admin_search_doc_url = send(Larvata::Signing.admin_search_doc_url, doc&.id)
       user = doc&.applicant
       title = "您的「#{doc&.title}」已核准了"
 
-      create_todo!('notice', user&.id, title, @admin_doc_url)
+      create_todo!('notice', user&.id, title, @admin_search_doc_url)
       mail(to: user&.email, subject: title)
     end
 
