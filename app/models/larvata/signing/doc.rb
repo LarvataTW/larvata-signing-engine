@@ -2,20 +2,21 @@ module Larvata::Signing
   class Doc < ApplicationRecord
     include Larvata::Signing::DocService
 
-    STATES = [:draft, :rejected, :signing, :void, :approved]
+    # STATES = [:draft, :rejected, :signing, :void, :approved]
+    STATES = {"draft" => "0", "rejected" => "1", "signing" => "2", "void" => "3", "approved" => "4"}
 
     enum state: STATES
 
-    belongs_to :flow, class_name: "Larvata::Signing::Flow", 
+    belongs_to :flow, class_name: "Larvata::Signing::Flow",
       foreign_key: "larvata_signing_flow_id", optional: true
 
-    belongs_to :resource, class_name: "Larvata::Signing::Resource", 
+    belongs_to :resource, class_name: "Larvata::Signing::Resource",
       foreign_key: "larvata_signing_resource_id", optional: true
 
-    has_many :resource_records, class_name: "Larvata::Signing::ResourceRecord", 
+    has_many :resource_records, class_name: "Larvata::Signing::ResourceRecord",
       foreign_key: "larvata_signing_doc_id", dependent: :destroy
 
-    has_many :stages, -> { order "seq ASC" }, class_name: "Larvata::Signing::Stage", 
+    has_many :stages, -> { order "seq ASC" }, class_name: "Larvata::Signing::Stage",
       foreign_key: "larvata_signing_doc_id", dependent: :destroy
 
     has_many :srecords, class_name: "Larvata::Signing::Srecord", through: :stages
