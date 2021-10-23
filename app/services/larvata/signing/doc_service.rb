@@ -17,7 +17,9 @@ module Larvata
           # 更新原始單據狀態
           resource_records.each do |res_rec|
             _form_data = res_rec.signing_resourceable
-            _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present?
+
+            _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:state]&.values&.include? "signing"
+            _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:status]&.values&.include? "signing"
           end
 
           send_messages("signing", self.stages.first&.id)
@@ -174,9 +176,9 @@ module Larvata
         Larvata::Signing::Srecord.transaction do
           if opt[:waiting_stage_typing].present? and opt[:waiting_signer_ids].present?
             # 建立加簽階段，並且設定此階段狀態為 signing
-            new_stage = Stage.create(larvata_signing_doc_id: rec.stage&.doc&.id, 
-                                     typing: opt[:waiting_stage_typing], 
-                                     parent_record_id: rec.id, 
+            new_stage = Stage.create(larvata_signing_doc_id: rec.stage&.doc&.id,
+                                     typing: opt[:waiting_stage_typing],
+                                     parent_record_id: rec.id,
                                      state: 'pending')
 
             new_stage.append_to!(rec.stage)
@@ -212,9 +214,9 @@ module Larvata
             current_stage.save!
 
             # 建立加簽階段，並且設定此階段狀態為 signing
-            new_stage = Stage.create(larvata_signing_doc_id: rec.stage&.doc&.id, 
-                                  typing: opt[:waiting_stage_typing], 
-                                  parent_record_id: rec.id, 
+            new_stage = Stage.create(larvata_signing_doc_id: rec.stage&.doc&.id,
+                                  typing: opt[:waiting_stage_typing],
+                                  parent_record_id: rec.id,
                                   state: 'signing')
 
             new_stage.append_to!(rec.stage)
@@ -254,7 +256,7 @@ module Larvata
         if parent_record&.waiting?
           # 建立一個新的簽核紀錄給原簽核人員
           Larvata::Signing::SrecordService
-            .create_srecord_and_send_message!(parent_record&.larvata_signing_stage_id, 
+            .create_srecord_and_send_message!(parent_record&.larvata_signing_stage_id,
                                               parent_record&.signer_id)
         end
       end

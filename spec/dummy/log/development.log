@@ -9456,3 +9456,11 @@ Migrating to AddDeadlineToSrecord (20210520032851)
             FROM sqlite_temp_master
             WHERE name='index_larvata_signing_todos_on_user_id' AND type='index'
 [0m
+  [1m[35m (1.4ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.4ms)[0m  [1m[34mSELECT COUNT(*) FROM "larvata_signing_docs"[0m
+  [1m[36mLarvata::Signing::Doc Load (0.4ms)[0m  [1m[34mSELECT "larvata_signing_docs".* FROM "larvata_signing_docs" WHERE "larvata_signing_docs"."state" = ?[0m  [["state", 2]]
+  [1m[35m (1.2ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
