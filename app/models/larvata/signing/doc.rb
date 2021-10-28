@@ -2,8 +2,7 @@ module Larvata::Signing
   class Doc < ApplicationRecord
     include Larvata::Signing::DocService
 
-    # STATES = [:draft, :rejected, :signing, :void, :approved]
-    STATES = {"draft" => "0", "rejected" => "1", "signing" => "2", "void" => "3", "approved" => "4"}
+    STATES = {"draft" => "0", "signing" => "1", "approved" => "2", "rejected" => "3", "void" => "4", "suspended" => "5"}
 
     enum state: STATES
 

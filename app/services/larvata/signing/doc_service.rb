@@ -38,10 +38,12 @@ module Larvata
       end
 
       # 中止
-      def terminate
-        rejected!
-        signing_stage&.terminated!
-        rejection_of_resource_records(resource_records)
+      def suspend
+        # rejected!
+        # signing_stage&.terminated!
+        # rejection_of_resource_records(resource_records)
+
+        suspended!
       end
 
       # 作廢
@@ -50,15 +52,17 @@ module Larvata
         rejection_of_resource_records(resource_records)
       end
 
-      # 重啟
+      # 從中止狀態重啟
       def resume
-        if stages.last.completed? and stages.last.srecords.exists?(state: 'signed') # 原狀態是核准
-          approved!
-          resource_records.rejected.each do |res|
-            res.update_column(:state, 'implement')
-            res.signing_resourceable.send(resource&.implement_method)
-          end
-        end
+        # if stages.last.completed? and stages.last.srecords.exists?(state: 'signed') # 原狀態是核准
+        #   approved!
+        #   resource_records.rejected.each do |res|
+        #     res.update_column(:state, 'implement')
+        #     res.signing_resourceable.send(resource&.implement_method)
+        #   end
+        # end
+
+        signing!
       end
 
       def rejection_of_resource_records(resource_records)
