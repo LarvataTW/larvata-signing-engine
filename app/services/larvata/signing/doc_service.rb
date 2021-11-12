@@ -323,10 +323,14 @@ module Larvata
         srecords = srecords.where(id: srecord_id) unless srecord_id.nil?
 
         srecords.each do |rec|
-          if Rails.env == 'production'
-            Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
+          if block_given?
+            if Rails.env == 'production'
+              Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
+            else
+              Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
+            end
           else
-            Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
+            yield.new(typing, rec).try(:call)
           end
         end
       end
