@@ -22,7 +22,7 @@ module Larvata
             _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:status]&.values&.include? "signing"
           end
 
-          send_messages("signing", self.stages.first&.id)
+          send_messages("signing", self.stages.first&.id) { yield if block_given? }
         end
       end
 
@@ -32,7 +32,7 @@ module Larvata
 
         srecords = signing_srecords(signing_stage, current_user)
 
-        send(signing_result, comment, srecords, opt)
+        send(signing_result, comment, srecords, opt) { yield if block_given? }
 
         self.reload
       end
@@ -120,7 +120,7 @@ module Larvata
 
             if can_enter_next_stage?(rec) # 是否可進入到下個階段
               complete_waiting_stage(rec.stage)
-              enter_next_stage(rec.stage, opt)
+              enter_next_stage(rec.stage, opt) { yield if block_given? }
             end
           end
         end
@@ -147,7 +147,7 @@ module Larvata
               rejection_of_resource_records(resource_records)
 
               # 發送駁回通知給申請人員
-              send_messages('reject', stage.id, rec.id)
+              send_messages('reject', stage.id, rec.id) { yield if block_given? }
             elsif opt[:return_stage_seq].present? # 退回到指定階段
               reset_stages = stages.includes(:srecords)
                 .where("seq >= ? and seq <= ?", opt[:return_stage_seq], stage&.seq)
@@ -165,7 +165,7 @@ module Larvata
                   _stage.signing!
 
                   # 發送簽核通知給申請人員
-                  send_messages('signing', _stage.id)
+                  send_messages('signing', _stage.id) { yield if block_given? }
                 else
                   _stage.pending!
                 end
@@ -230,7 +230,7 @@ module Larvata
               new_rec = new_stage.srecords.create(signer_id: signer_id, dept_id: nil, role: nil, parent_record_id: rec.id)
 
               # 發送簽核通知給加簽人員
-              send_messages('signing', new_stage.id, new_rec.id)
+              send_messages('signing', new_stage.id, new_rec.id) { yield if block_given? }
             end
           end
         end
@@ -293,7 +293,7 @@ module Larvata
           approved!
 
           # 發送核准通知給申請人
-          send_messages('approve', stage.id)
+          send_messages('approve', stage.id) { yield if block_given? }
         else
           next_stage = stage.next_stage
 
@@ -308,7 +308,7 @@ module Larvata
             next_stage&.update_attributes!(state: "signing")
 
             # 發送下一階段的簽核人員通知
-            send_messages('signing', next_stage.id)
+            send_messages('signing', next_stage.id) { yield if block_given? }
           end
         end
       end
@@ -324,13 +324,13 @@ module Larvata
 
         srecords.each do |rec|
           if block_given?
+            yield.new(typing, rec).try(:call)
+          else
             if Rails.env == 'production'
               Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
             else
               Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
             end
-          else
-            yield.new(typing, rec).try(:call)
           end
         end
       end
