@@ -139,12 +139,14 @@ module Larvata
             rec.comment = comment
             rec.save!
 
-            if stage.is_first? or opt.empty? # 退回到申請人
+            if stage.is_first? or opt.empty? # 駁回
               # 駁回的階段狀態變為已完成
               stage.state = "completed"
               stage.save!
 
               rejection_of_resource_records(resource_records)
+
+              rejected!
 
               # 發送駁回通知給申請人員
               send_messages('reject', stage.id, rec.id) { yield if block_given? }
