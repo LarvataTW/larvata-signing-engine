@@ -2,6 +2,9 @@ module Larvata::Signing
   class Doc < ApplicationRecord
     include Larvata::Signing::DocService
 
+    # 是否在駁回或作廢時，略過不執行原單據的 returned_method，為 true 時就略過
+    attribute :skip_returned_method, default: false
+
     STATES = {"draft" => "0", "signing" => "1", "approved" => "2", "rejected" => "3", "void" => "4", "suspended" => "5"}
 
     enum state: STATES
