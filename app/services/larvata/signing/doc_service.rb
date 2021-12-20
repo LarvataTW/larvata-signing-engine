@@ -70,8 +70,10 @@ module Larvata
         resource_records.update_all(state: "rejected")
 
         # 執行申請單據的 return_method
-        resource_records.each do |res_rec|
-          res_rec.signing_resourceable&.send(resource&.returned_method)
+        unless self.skip_returned_method
+          resource_records.each do |res_rec|
+            res_rec.signing_resourceable&.send(resource&.returned_method)
+          end
         end
       end
 
