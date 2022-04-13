@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    larvata-signing (0.5.5)
+    larvata-signing (0.6.0)
       rails (>= 5.1.4)
 
 GEM
