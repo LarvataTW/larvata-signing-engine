@@ -4,10 +4,13 @@ module Larvata::Signing
 
     self.table_name = "larvata_signing_records"
 
-    # SIGNING_RESULTS = [:waiting, :rejected, :approved]
-    # STATES = [:pending, :notify, :terminated, :signed]
-    SIGNING_RESULTS = {"waiting" => "0", "rejected" => "1", "approved" => "2"}
-    STATES = {"pending" => "0", "notify" => "1", "terminated" => "2", "signed" => "3"}
+    if ENV['ENUM_GEM'] == 'enum_help'
+      SIGNING_RESULTS = [:waiting, :rejected, :approved]
+      STATES = [:pending, :notify, :terminated, :signed]
+    else
+      SIGNING_RESULTS = {"waiting" => "0", "rejected" => "1", "approved" => "2"}
+      STATES = {"pending" => "0", "notify" => "1", "terminated" => "2", "signed" => "3"}
+    end
 
     enum state: STATES
     enum signing_result: SIGNING_RESULTS

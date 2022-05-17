@@ -1,7 +1,10 @@
 module Larvata::Signing
   class Todo < ApplicationRecord
-    # TYPING = [:signing_doc, :notice]
-    TYPING = {"signing_doc" => "0", "notice" => "1"}
+    if ENV['ENUM_GEM'] == 'enum_help'
+      TYPING = [:signing_doc, :notice]
+    else
+      TYPING = {"signing_doc" => "0", "notice" => "1"}
+    end
 
     enum state: TYPING
 

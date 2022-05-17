@@ -1,7 +1,10 @@
 module Larvata::Signing
   class ResourceRecord < ApplicationRecord
-    # STATES = [:pending, :signing, :rejected, :implement, :archived]
-    STATES = {"pending" => "0", "signing" => "1", "rejected" => "2", "implement" => "3", "archived" => "4"}
+    if ENV['ENUM_GEM'] == 'enum_help'
+      STATES = [:pending, :signing, :rejected, :implement, :archived]
+    else
+      STATES = {"pending" => "0", "signing" => "1", "rejected" => "2", "implement" => "3", "archived" => "4"}
+    end
 
     enum state: STATES
 

@@ -18,11 +18,14 @@ module Larvata
           resource_records.each do |res_rec|
             _form_data = res_rec.signing_resourceable
 
-            _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:state]&.values&.include? "signing"
-            _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:status]&.values&.include? "signing"
+            _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)&.dig(:state)&.values&.include? "signing"
+            _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)&.dig(:status)&.values&.include? "signing"
           end
 
           send_messages("signing", self.stages.first&.id) { yield if block_given? }
+
+          # 對第一個階段的簽核人員，如果有與單據申請人相同者，直接核准。
+          approve_the_first_srecord_include_applicant if the_first_srecord_include_applicant?
         end
       end
 
@@ -243,7 +246,7 @@ module Larvata
       # 判斷是否可以進入到下個階段
       # 如果可以進入下個階段，且目前階段為未決加簽，就會建立一個新的簽核紀錄給原簽核人員
       def can_enter_next_stage?(rec)
-        stage = rec.stage
+        stage = rec.stage.reload
 
         if stage.sign? or stage.any_supervisor? # 串簽 or 擇辦
           # 進到下一個階段或是讓申請單據簽核狀態變為核准
@@ -318,11 +321,15 @@ module Larvata
       end
 
       # 發送簽核通知
+      # 會避開與申請者相同的簽核紀錄
       # @param typing [String] 通知類型：signing（簽核）、approve （核准）、reject（駁回）
       def send_messages(typing, stage_id = nil, srecord_id = nil)
         srecords = Larvata::Signing::Srecord
-          .includes(:signer, stage: { doc: :resource })
-          .where(larvata_signing_stage_id: stage_id)
+                     .joins(stage: :doc)
+                     .includes(:signer, stage: { doc: :resource })
+                     .where(larvata_signing_stage_id: stage_id)
+                     .where('signer_id <> larvata_signing_docs.applicant_id')
+
         srecords = srecords.where(state: 'pending') if typing == 'signing'
         srecords = srecords.where(id: srecord_id) unless srecord_id.nil?
 
@@ -353,6 +360,15 @@ module Larvata
           docs_of_today = self.class.where(created_at: Time.current.midnight..Time.current.end_of_day)
           self.signing_number = "#{Time.current.strftime("%Y%m%d")}#{(docs_of_today.count+1).to_s.rjust(3, '0')}"
         end
+      end
+
+      def approve_the_first_srecord_include_applicant
+        self.sign(self.applicant, :approve, 'auto approve')
+      end
+
+      def the_first_srecord_include_applicant?
+        applicant_id = self.applicant_id
+        self.stages.first.srecords.any? {|rec| rec.signer_id == applicant_id}
       end
     end
   end

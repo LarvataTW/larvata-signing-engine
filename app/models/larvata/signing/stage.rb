@@ -2,10 +2,13 @@ module Larvata::Signing
   class Stage < ApplicationRecord
     include Larvata::Signing::StageService
 
-    # TYPINGS = [:sign, :counter_sign, :any_supervisor, :inform]
-    # STATES = [:pending, :signing, :completed, :terminated]
-    TYPINGS = {"sign" => "0", "counter_sign" => "1", "any_supervisor" => "2", "inform" => "3"}
-    STATES = {"pending" => "0", "signing" => "1", "completed" => "2", "terminated" => "3"}
+    if ENV['ENUM_GEM'] == 'enum_help'
+      TYPINGS = [:sign, :counter_sign, :any_supervisor, :inform]
+      STATES = [:pending, :signing, :completed, :terminated]
+    else
+      TYPINGS = {"sign" => "0", "counter_sign" => "1", "any_supervisor" => "2", "inform" => "3"}
+      STATES = {"pending" => "0", "signing" => "1", "completed" => "2", "terminated" => "3"}
+    end
 
     enum typing: TYPINGS
     enum state: STATES
