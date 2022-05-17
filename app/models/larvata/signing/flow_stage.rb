@@ -1,7 +1,10 @@
 module Larvata::Signing
   class FlowStage < ApplicationRecord
-    # TYPINGS = [:sign, :counter_sign, :any_supervisor, :inform]
-    TYPINGS = {"sign" => "0", "counter_sign" => "1", "any_supervisor" => "2", "inform" => "3"}
+    if ENV['ENUM_GEM'] == 'enum_help'
+      TYPINGS = [:sign, :counter_sign, :any_supervisor, :inform]
+    else
+      TYPINGS = {"sign" => "0", "counter_sign" => "1", "any_supervisor" => "2", "inform" => "3"}
+    end
 
     enum typing: TYPINGS
 
