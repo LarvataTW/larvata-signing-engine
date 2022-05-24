@@ -73,7 +73,7 @@ module Larvata
         resource_records.update_all(state: "rejected")
 
         # 執行申請單據的 return_method
-        unless self.skip_returned_method
+        unless self.try(:skip_returned_method)
           resource_records.each do |res_rec|
             res_rec.signing_resourceable&.send(resource&.returned_method)
           end
@@ -334,8 +334,8 @@ module Larvata
         srecords = srecords.where(id: srecord_id) unless srecord_id.nil?
 
         srecords.each do |rec|
-          if block_given?
-            yield.new(typing, rec).try(:call)
+          if block_given? and not yield.nil?
+            yield&.new(typing, rec)&.try(:call)
           else
             if Rails.env == 'production'
               Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
