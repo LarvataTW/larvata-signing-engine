@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_20_032851) do
+ActiveRecord::Schema.define(version: 2022_07_13_064337) do
 
   create_table "inquirements", force: :cascade do |t|
     t.string "name"
@@ -41,8 +41,12 @@ ActiveRecord::Schema.define(version: 2021_05_20_032851) do
     t.integer "state"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "applicant_id"
+    t.integer "applicant_id"
     t.datetime "committed_at"
+    t.integer "applicant_com_id"
+    t.integer "applicant_dept_id"
+    t.index ["applicant_com_id"], name: "index_larvata_signing_docs_on_applicant_com_id"
+    t.index ["applicant_dept_id"], name: "index_larvata_signing_docs_on_applicant_dept_id"
     t.index ["applicant_id"], name: "index_larvata_signing_docs_on_applicant_id"
     t.index ["larvata_signing_flow_id"], name: "index_larvata_signing_docs_on_larvata_signing_flow_id"
     t.index ["larvata_signing_resource_id"], name: "index_larvata_signing_docs_on_larvata_signing_resource_id"
@@ -134,6 +138,7 @@ ActiveRecord::Schema.define(version: 2021_05_20_032851) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "label_method"
+    t.string "submitted_method"
     t.index ["code"], name: "index_larvata_signing_resources_on_code"
     t.index ["larvata_signing_flow_id"], name: "index_larvata_signing_resources_on_larvata_signing_flow_id"
   end
@@ -178,5 +183,4 @@ ActiveRecord::Schema.define(version: 2021_05_20_032851) do
   add_foreign_key "larvata_signing_records", "larvata_signing_stages"
   add_foreign_key "larvata_signing_resource_records", "larvata_signing_docs"
   add_foreign_key "larvata_signing_resources", "larvata_signing_flows"
-  add_foreign_key "larvata_signing_stages", "larvata_signing_docs"
 end
