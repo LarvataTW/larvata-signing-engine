@@ -18,8 +18,13 @@ module Larvata
           resource_records.each do |res_rec|
             _form_data = res_rec.signing_resourceable
 
-            _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)&.dig(:state)&.values&.include? "signing"
-            _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)&.dig(:status)&.values&.include? "signing"
+            if _form_data.class.method_defined?(resource&.submitted_method || '')
+              _form_data.send(resource&.submitted_method)
+            else
+              # 在 Resource 沒有定義 submitted_method 的話，就預設要去更新 state 或是 status 欄位值
+              _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)&.dig(:state)&.values&.include? "signing"
+              _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)&.dig(:status)&.values&.include? "signing"
+            end
           end
 
           send_messages("signing", self.stages.first&.id) { yield if block_given? }

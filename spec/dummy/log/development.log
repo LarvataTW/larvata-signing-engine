@@ -9464,3 +9464,183 @@ Migrating to AddDeadlineToSrecord (20210520032851)
   [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
   [1m[35m (0.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
   [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (1.3ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddApplicantComAndDeptToDoc (20220413122002)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.2ms)[0m  [1m[35mALTER TABLE "docs" ADD "applicant_com_id" bigint[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mrollback transaction[0m
+  [1m[35m (0.8ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddApplicantComAndDeptToDoc (20220413122002)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "larvata_signing_docs" ADD "applicant_com_id" bigint[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_com_id" ON "larvata_signing_docs" ("applicant_com_id")[0m
+  [1m[35m (0.4ms)[0m  [1m[35mALTER TABLE "larvata_signing_docs" ADD "applicant_dept_id" bigint[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_dept_id" ON "larvata_signing_docs" ("applicant_dept_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20220413122002"]]
+  [1m[36mTRANSACTION (2.9ms)[0m  [1m[36mcommit transaction[0m
+Migrating to AddSubmitSigningMethodToDoc (20220713064337)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "larvata_signing_docs" ADD "submit_signing_method" varchar[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (1.4ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddSubmitSigningMethodToDoc (20220713064337)
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.3ms)[0m  [1m[35mCREATE TEMPORARY TABLE "alarvata_signing_docs" ("id" integer NOT NULL PRIMARY KEY, "larvata_signing_flow_id" integer DEFAULT NULL, "larvata_signing_resource_id" integer DEFAULT NULL, "signing_number" varchar DEFAULT NULL, "title" varchar DEFAULT NULL, "remark" text DEFAULT NULL, "remind_period" integer DEFAULT NULL, "state" integer DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "applicant_id" integer DEFAULT NULL, "committed_at" datetime DEFAULT NULL, "applicant_com_id" integer DEFAULT NULL, "applicant_dept_id" integer DEFAULT NULL, "submit_signing_method" varchar DEFAULT NULL)[0m
+  [1m[35m (0.3ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_applicant_dept_id" ON "alarvata_signing_docs" ("applicant_dept_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_applicant_com_id" ON "alarvata_signing_docs" ("applicant_com_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_applicant_id" ON "alarvata_signing_docs" ("applicant_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_state" ON "alarvata_signing_docs" ("state")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_title" ON "alarvata_signing_docs" ("title")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_signing_number" ON "alarvata_signing_docs" ("signing_number")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_larvata_signing_resource_id" ON "alarvata_signing_docs" ("larvata_signing_resource_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_larvata_signing_flow_id" ON "alarvata_signing_docs" ("larvata_signing_flow_id")[0m
+  [1m[35m (0.5ms)[0m  [1m[32mINSERT INTO "alarvata_signing_docs" ("id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id","submit_signing_method")
+                     SELECT "id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id","submit_signing_method" FROM "larvata_signing_docs"[0m
+  [1m[35m (2.6ms)[0m  [1m[35mDROP TABLE "larvata_signing_docs"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "larvata_signing_docs" ("id" integer NOT NULL PRIMARY KEY, "larvata_signing_flow_id" integer DEFAULT NULL, "larvata_signing_resource_id" integer DEFAULT NULL, "signing_number" varchar DEFAULT NULL, "title" varchar DEFAULT NULL, "remark" text DEFAULT NULL, "remind_period" integer DEFAULT NULL, "state" integer DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "applicant_id" integer DEFAULT NULL, "committed_at" datetime DEFAULT NULL, "applicant_com_id" integer DEFAULT NULL, "applicant_dept_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_0f6c56c20c"
+FOREIGN KEY ("larvata_signing_resource_id")
+  REFERENCES "larvata_signing_resources" ("id")
+, CONSTRAINT "fk_rails_419a380014"
+FOREIGN KEY ("larvata_signing_flow_id")
+  REFERENCES "larvata_signing_flows" ("id")
+)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_larvata_signing_flow_id" ON "larvata_signing_docs" ("larvata_signing_flow_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_larvata_signing_resource_id" ON "larvata_signing_docs" ("larvata_signing_resource_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_signing_number" ON "larvata_signing_docs" ("signing_number")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_title" ON "larvata_signing_docs" ("title")[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_state" ON "larvata_signing_docs" ("state")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_id" ON "larvata_signing_docs" ("applicant_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_com_id" ON "larvata_signing_docs" ("applicant_com_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_dept_id" ON "larvata_signing_docs" ("applicant_dept_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "larvata_signing_docs" ("id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id")
+                     SELECT "id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id" FROM "alarvata_signing_docs"[0m
+  [1m[35m (0.4ms)[0m  [1m[35mDROP TABLE "alarvata_signing_docs"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.5ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = ?[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (0.8ms)[0m  [1m[36mcommit transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.9ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddSubmitSigningMethodToDoc (20220713064337)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "larvata_signing_docs" ADD "submitted_method" varchar[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (1.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddSubmitSigningMethodToDoc (20220713064337)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TEMPORARY TABLE "alarvata_signing_docs" ("id" integer NOT NULL PRIMARY KEY, "larvata_signing_flow_id" integer DEFAULT NULL, "larvata_signing_resource_id" integer DEFAULT NULL, "signing_number" varchar DEFAULT NULL, "title" varchar DEFAULT NULL, "remark" text DEFAULT NULL, "remind_period" integer DEFAULT NULL, "state" integer DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "applicant_id" integer DEFAULT NULL, "committed_at" datetime DEFAULT NULL, "applicant_com_id" integer DEFAULT NULL, "applicant_dept_id" integer DEFAULT NULL, "submitted_method" varchar DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_applicant_dept_id" ON "alarvata_signing_docs" ("applicant_dept_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_applicant_com_id" ON "alarvata_signing_docs" ("applicant_com_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_applicant_id" ON "alarvata_signing_docs" ("applicant_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_state" ON "alarvata_signing_docs" ("state")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_title" ON "alarvata_signing_docs" ("title")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_signing_number" ON "alarvata_signing_docs" ("signing_number")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_larvata_signing_resource_id" ON "alarvata_signing_docs" ("larvata_signing_resource_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_docs_on_larvata_signing_flow_id" ON "alarvata_signing_docs" ("larvata_signing_flow_id")[0m
+  [1m[35m (0.6ms)[0m  [1m[32mINSERT INTO "alarvata_signing_docs" ("id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id","submitted_method")
+                     SELECT "id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id","submitted_method" FROM "larvata_signing_docs"[0m
+  [1m[35m (3.2ms)[0m  [1m[35mDROP TABLE "larvata_signing_docs"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "larvata_signing_docs" ("id" integer NOT NULL PRIMARY KEY, "larvata_signing_flow_id" integer DEFAULT NULL, "larvata_signing_resource_id" integer DEFAULT NULL, "signing_number" varchar DEFAULT NULL, "title" varchar DEFAULT NULL, "remark" text DEFAULT NULL, "remind_period" integer DEFAULT NULL, "state" integer DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "applicant_id" integer DEFAULT NULL, "committed_at" datetime DEFAULT NULL, "applicant_com_id" integer DEFAULT NULL, "applicant_dept_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_419a380014"
+FOREIGN KEY ("larvata_signing_flow_id")
+  REFERENCES "larvata_signing_flows" ("id")
+, CONSTRAINT "fk_rails_0f6c56c20c"
+FOREIGN KEY ("larvata_signing_resource_id")
+  REFERENCES "larvata_signing_resources" ("id")
+)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_larvata_signing_flow_id" ON "larvata_signing_docs" ("larvata_signing_flow_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_larvata_signing_resource_id" ON "larvata_signing_docs" ("larvata_signing_resource_id")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_signing_number" ON "larvata_signing_docs" ("signing_number")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_title" ON "larvata_signing_docs" ("title")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_state" ON "larvata_signing_docs" ("state")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_id" ON "larvata_signing_docs" ("applicant_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_com_id" ON "larvata_signing_docs" ("applicant_com_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_docs_on_applicant_dept_id" ON "larvata_signing_docs" ("applicant_dept_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "larvata_signing_docs" ("id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id")
+                     SELECT "id","larvata_signing_flow_id","larvata_signing_resource_id","signing_number","title","remark","remind_period","state","created_at","updated_at","applicant_id","committed_at","applicant_com_id","applicant_dept_id" FROM "alarvata_signing_docs"[0m
+  [1m[35m (0.3ms)[0m  [1m[35mDROP TABLE "alarvata_signing_docs"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.6ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = ?[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (0.8ms)[0m  [1m[36mcommit transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.9ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddSubmitSigningMethodToDoc (20220713064337)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "larvata_signing_resources" ADD "submitted_method" varchar[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (1.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddSubmitSigningMethodToDoc (20220713064337)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TEMPORARY TABLE "alarvata_signing_resources" ("id" integer NOT NULL PRIMARY KEY, "code" varchar DEFAULT NULL, "name" varchar DEFAULT NULL, "select_model" varchar DEFAULT NULL, "select_method" varchar DEFAULT NULL, "view_path" varchar DEFAULT NULL, "returned_method" varchar DEFAULT NULL, "approved_method" varchar DEFAULT NULL, "implement_method" varchar DEFAULT NULL, "larvata_signing_flow_id" integer DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "label_method" varchar DEFAULT NULL, "submitted_method" varchar DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_resources_on_code" ON "alarvata_signing_resources" ("code")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_alarvata_signing_resources_on_larvata_signing_flow_id" ON "alarvata_signing_resources" ("larvata_signing_flow_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "alarvata_signing_resources" ("id","code","name","select_model","select_method","view_path","returned_method","approved_method","implement_method","larvata_signing_flow_id","created_at","updated_at","label_method","submitted_method")
+                     SELECT "id","code","name","select_model","select_method","view_path","returned_method","approved_method","implement_method","larvata_signing_flow_id","created_at","updated_at","label_method","submitted_method" FROM "larvata_signing_resources"[0m
+  [1m[35m (0.4ms)[0m  [1m[35mDROP TABLE "larvata_signing_resources"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "larvata_signing_resources" ("id" integer NOT NULL PRIMARY KEY, "code" varchar DEFAULT NULL, "name" varchar DEFAULT NULL, "select_model" varchar DEFAULT NULL, "select_method" varchar DEFAULT NULL, "view_path" varchar DEFAULT NULL, "returned_method" varchar DEFAULT NULL, "approved_method" varchar DEFAULT NULL, "implement_method" varchar DEFAULT NULL, "larvata_signing_flow_id" integer DEFAULT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "label_method" varchar DEFAULT NULL, CONSTRAINT "fk_rails_2c92d4cfe3"
+FOREIGN KEY ("larvata_signing_flow_id")
+  REFERENCES "larvata_signing_flows" ("id")
+)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_resources_on_larvata_signing_flow_id" ON "larvata_signing_resources" ("larvata_signing_flow_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_larvata_signing_resources_on_code" ON "larvata_signing_resources" ("code")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "larvata_signing_resources" ("id","code","name","select_model","select_method","view_path","returned_method","approved_method","implement_method","larvata_signing_flow_id","created_at","updated_at","label_method")
+                     SELECT "id","code","name","select_model","select_method","view_path","returned_method","approved_method","implement_method","larvata_signing_flow_id","created_at","updated_at","label_method" FROM "alarvata_signing_resources"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "alarvata_signing_resources"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.1ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = ?[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (1.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.9ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddSubmitSigningMethodToResource (20220713064337)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "larvata_signing_resources" ADD "submitted_method" varchar[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20220713064337"]]
+  [1m[36mTRANSACTION (1.0ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.0ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
