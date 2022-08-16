@@ -4,6 +4,8 @@ module Larvata
       # 確認送簽
       def commit!
         Larvata::Signing::Doc.transaction do
+          remove_duplicate_signers_of_stages
+
           self.state = "signing"
           self.committed_at = Time.current
           self.save!
@@ -18,12 +20,12 @@ module Larvata
           resource_records.each do |res_rec|
             _form_data = res_rec.signing_resourceable
 
-            if _form_data.class.method_defined?(resource&.submitted_method || '')
+            if _form_data.class.method_defined?(resource&.try(:submitted_method) || '')
               _form_data.send(resource&.submitted_method)
             else
               # 在 Resource 沒有定義 submitted_method 的話，就預設要去更新 state 或是 status 欄位值
-              _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:state]&.values&.include? "signing"
-              _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or _form_data.class.try(:enumerized_attributes)[:status]&.values&.include? "signing"
+              _form_data&.update_column("state", 'signing') if _form_data.class.defined_enums&.dig("state")&.dig("signing").present? or (_form_data.class.try(:enumerized_attributes) and _form_data.class.try(:enumerized_attributes)[:state]&.values&.include? "signing")
+              _form_data&.update_column("status", 'signing') if _form_data.class.defined_enums&.dig("status")&.dig("signing").present? or (_form_data.class.try(:enumerized_attributes) and _form_data.class.try(:enumerized_attributes)[:status]&.values&.include? "signing")
             end
           end
 
@@ -374,6 +376,38 @@ module Larvata
       def the_first_srecord_include_applicant?
         applicant_id = self.applicant_id
         self.stages.first.srecords.any? {|rec| rec.signer_id == applicant_id}
+      end
+
+      # 移除所有簽核階段中重複的簽核人員
+      # 對於重複的簽核人員，選擇保留越後面階段的簽核人員資料
+      def remove_duplicate_signers_of_stages
+        # 找出要刪除的 signer_ids
+        signer_ids = self.stages.map { |stage| stage.srecords.pluck(:signer_id) }.flatten
+        uniq_signer_ids = signer_ids.uniq
+        uniq_signer_ids.each do |uniq_signer_id|
+          signer_ids.delete_at(signer_ids.index(uniq_signer_id))
+        end
+
+        # 移除重複的簽核人員
+        self.stages.each do |stage|
+          srecords = stage.srecords
+          srecords_size = srecords.size
+          srecords.each do |srecord|
+            # 移除有重複 signer_id 的 srecord
+            remove_signer_id_index = signer_ids.index(srecord.signer_id)
+            if remove_signer_id_index
+              signer_ids.delete_at(remove_signer_id_index)
+              srecord.delete
+              srecords_size -= 1
+            end
+          end
+
+          # 如果該階段下沒有任何簽核人員，則刪除此階段
+          # 這裡不能使用 stage.delete，否則會得到 can't modify frozen hash 的錯誤
+          if srecords_size == 0
+            stage.class.find_by_id(stage.id).delete
+          end
+        end
       end
     end
   end
