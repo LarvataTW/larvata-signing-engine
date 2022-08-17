@@ -12,6 +12,6 @@ module Larvata
 
     # 審批簽呈資料
     mattr_accessor :admin_signing_doc_url
-    @@admin_signing_doc_url = 'admin_signing_doc_url'
+    @@admin_signing_doc_url = 'edit_admin_signing_doc_url'
   end
 end

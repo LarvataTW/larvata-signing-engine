@@ -10,6 +10,8 @@ module Larvata
           self.committed_at = Time.current
           self.save!
 
+          self.reload
+
           first_stage = self.stages.first
           first_stage&.state = "signing"
           first_stage&.save!
@@ -337,18 +339,17 @@ module Larvata
                      .where(larvata_signing_stage_id: stage_id)
                      .where('signer_id <> larvata_signing_docs.applicant_id')
 
-        srecords = srecords.where(state: 'pending') if typing == 'signing'
+        srecords = srecords.where(state: 'pending') if typing == 'signing' # 簽核時，只發給尚未簽核的人員
+        srecords = srecords.where(state: 'signed') if typing == 'reject' or typing == 'approve' # 核准或駁回時，只發給有簽核過的人員
         srecords = srecords.where(id: srecord_id) unless srecord_id.nil?
 
-        srecords.each do |rec|
-          if block_given? and not yield.nil?
-            yield&.new(typing, rec)&.try(:call)
+        if block_given? and not yield.nil?
+          yield&.new(typing, srecords)&.try(:call)
+        else
+          if Rails.env == 'production'
+            Larvata::Signing::SigningMailer.send(typing, srecords).deliver_later
           else
-            if Rails.env == 'production'
-              Larvata::Signing::SigningMailer.send(typing, rec).deliver_later
-            else
-              Larvata::Signing::SigningMailer.send(typing, rec).deliver_now
-            end
+            Larvata::Signing::SigningMailer.send(typing, srecords).deliver_now
           end
         end
       end
