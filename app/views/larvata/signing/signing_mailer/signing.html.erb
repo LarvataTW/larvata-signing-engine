@@ -1,5 +1,5 @@
-<p><%= @rec.signer.name %> 您好，</p>
+<p><%= @user.name %> 您好，</p>
 
-<p>有新的<%= @rec.stage&.doc&.resource&.name %>簽核單需要簽核，</p>
+<p>簽呈 <%= @title %> 需要您簽核。</p>
 
 <p>請到「簽核作業」＞「簽呈審批作業」完成簽核，或點擊<%= link_to '這裡', @admin_signing_doc_url %>進入該簽核單，謝謝。</p>
