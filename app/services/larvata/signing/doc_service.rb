@@ -6,6 +6,8 @@ module Larvata
         Larvata::Signing::Doc.transaction do
           remove_duplicate_signers_of_stages
 
+          reindex_seq_of_stages
+
           self.state = "signing"
           self.committed_at = Time.current
           self.save!
@@ -408,6 +410,13 @@ module Larvata
           if srecords_size == 0
             stage.class.find_by_id(stage.id).delete
           end
+        end
+      end
+
+      # 將現有的簽核階段
+      def reindex_seq_of_stages
+        self.class.find_by(id: self.id)&.stages&.each_with_index do |stage, index|
+          stage.update_attributes(seq: index + 1)
         end
       end
     end
