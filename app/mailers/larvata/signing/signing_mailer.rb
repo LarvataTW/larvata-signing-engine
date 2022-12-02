@@ -3,36 +3,55 @@ module Larvata::Signing
     include Rails.application.routes.url_helpers
 
     # 簽核通知
+    # @param recs [Signing::Srecord] 或是 Signing::Doc 簽核紀錄或是簽核單，因為 recs 會排除掉簽核人員即申請人的情況
     def signing(recs)
-      recs.each do |rec|
-        build_doc(rec)
-        build_doc_urls
-        build_title("[#{@doc&.title}] 需要您簽核")
-        create_todo_and_send_email(rec&.signer)
+      if recs.class.name != "Signing::Doc"
+        recs.each do |rec|
+          build_doc(rec)
+          build_doc_urls
+          build_title("[#{@doc&.title}] 需要您簽核")
+          create_todo_and_send_email(rec&.signer)
+        end
       end
     end
 
     # 駁回通知
+    # @param recs [Signing::Srecord] 或是 Signing::Doc 簽核紀錄或是簽核單，因為 recs 會排除掉簽核人員即申請人的情況
     def reject(recs)
-      recs.each do |rec|
-        build_doc(rec)
+      if recs.class.name == "Signing::Doc"
+        @doc = recs
         build_applicant
         build_doc_urls
         build_title("[#{@doc&.title}] 被駁回了")
-        create_todo_and_send_email(rec&.signer)
+      else
+        recs.each do |rec|
+          build_doc(rec)
+          build_applicant
+          build_doc_urls
+          build_title("[#{@doc&.title}] 被駁回了")
+          create_todo_and_send_email(rec&.signer)
+        end
       end
 
       create_todo_and_send_email(@applicant)
     end
 
     # 核准通知
+    # @param recs [Signing::Srecord] 或是 Signing::Doc 簽核紀錄或是簽核單，因為 recs 會排除掉簽核人員即申請人的情況
     def approve(recs)
-      recs.each do |rec|
-        build_doc(rec)
+      if recs.class.name == "Signing::Doc"
+        @doc = recs
         build_applicant
         build_doc_urls
         build_title("[#{@doc&.title}] 已核准了")
-        create_todo_and_send_email(rec&.signer)
+      else
+        recs.each do |rec|
+          build_doc(rec)
+          build_applicant
+          build_doc_urls
+          build_title("[#{@doc&.title}] 已核准了")
+          create_todo_and_send_email(rec&.signer)
+        end
       end
 
       create_todo_and_send_email(@applicant)
