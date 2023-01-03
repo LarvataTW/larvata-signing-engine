@@ -207,7 +207,11 @@ module Larvata
 
             # 建立加簽人員的簽核紀錄
             opt[:waiting_signer_ids]&.split(',').each do |signer_id|
-              new_stage.srecords.create(signer_id: signer_id, dept_id: nil, role: nil, parent_record_id: rec.id)
+              if defined? TreeNodeItem
+                tree_node_item = TreeNodeItem.where(user_id: signer_id).first
+              end
+
+              new_stage.srecords.create(signer_id: signer_id, com_id: tree_node_item&.com_id, dept_id: tree_node_item&.dept_id, role: nil, waiting_reason: opt[:waiting_reason], parent_record_id: rec.id)
             end
           end
         end
@@ -245,7 +249,11 @@ module Larvata
 
             # 建立加簽人員的簽核紀錄
             opt[:waiting_signer_ids].split(',').each do |signer_id|
-              new_rec = new_stage.srecords.create(signer_id: signer_id, dept_id: nil, role: nil, parent_record_id: rec.id)
+              if defined? TreeNodeItem
+                tree_node_item = TreeNodeItem.where(user_id: signer_id).first
+              end
+
+              new_rec = new_stage.srecords.create(signer_id: signer_id, com_id: tree_node_item&.com_id, dept_id: tree_node_item&.dept_id, role: nil, waiting_reason: opt[:waiting_reason], parent_record_id: rec.id)
 
               # 發送簽核通知給加簽人員
               send_messages('signing', new_stage.id, new_rec.id) { yield if block_given? }
