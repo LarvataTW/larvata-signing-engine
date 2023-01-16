@@ -141,6 +141,7 @@ module Larvata
           end
         end
       end
+      alias_method :to_approve, :approve
 
       # 駁回
       #   需要從 opt 抓取參數值，來決定回到哪一個簽核階段
@@ -192,6 +193,7 @@ module Larvata
           end
         end
       end
+      alias_method :to_reject, :reject
 
       # 核准加簽
       def generate_waiting_stage(rec, **opt)
@@ -261,6 +263,7 @@ module Larvata
           end
         end
       end
+      alias_method :to_wait, :wait
 
       # 判斷是否可以進入到下個階段
       # 如果可以進入下個階段，且目前階段為未決加簽，就會建立一個新的簽核紀錄給原簽核人員
