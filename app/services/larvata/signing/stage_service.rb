@@ -40,13 +40,15 @@ module Larvata
           .where("state = ?", "pending")
           .first
 
-        Larvata::Signing::Stage
-          .where(larvata_signing_doc_id: larvata_signing_doc_id)
-          .where("seq >= ?", target_stage.seq)
-          .update_all("seq = seq + 1")
+        if target_stage
+          Larvata::Signing::Stage
+            .where(larvata_signing_doc_id: larvata_signing_doc_id)
+            .where("seq >= ?", target_stage.seq)
+            .update_all("seq = seq + 1")
 
-        self.seq = target_stage.seq
-        self.save!
+          self.seq = target_stage.seq
+          self.save!
+        end
       end
 
       private
