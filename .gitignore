@@ -10,3 +10,4 @@ tags
 .ruby-version
 .rbenv-gemsets
 .idea/
+.idea/larvata-signing.iml
