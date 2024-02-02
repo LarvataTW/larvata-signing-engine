@@ -1,9 +1,12 @@
 module Larvata::Signing
   class Flow < ApplicationRecord
-    has_many :resources, class_name: "Larvata::Signing::Resource", 
-      foreign_key: "larvata_signing_flow_id"
+    has_many :flow_resources, class_name: "Larvata::Signing::FlowResource", foreign_key: "larvata_signing_flow_id"
+    has_many :resources, class_name: "Larvata::Signing::Resource", through: :flow_resources, source: :resource
 
-    has_many :flow_stages, class_name: "Larvata::Signing::FlowStage", 
+    has_many :flow_depts, class_name: "Larvata::Signing::FlowDept", foreign_key: "larvata_signing_flow_id"
+    has_many :depts, class_name: "Org", through: :flow_depts, source: :dept
+
+    has_many :flow_stages, class_name: "Larvata::Signing::FlowStage",
       foreign_key: "larvata_signing_flow_id"
 
     # 取得指定簽核流程資料結構，並放入簽核單內

@@ -1,6 +1,8 @@
 module Larvata::Signing
   class Resource < ApplicationRecord
-    belongs_to :flow, class_name: "Larvata::Signing::Flow",
-      foreign_key: "larvata_signing_flow_id", optional: true
+    has_many :flow_resources, class_name: "Larvata::Signing::FlowResource", foreign_key: "larvata_signing_resource_id"
+
+    has_many :flows, class_name: "Larvata::Signing::Flow",
+             through: :flow_resources, source: :flow
   end
 end
