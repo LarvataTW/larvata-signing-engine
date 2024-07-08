@@ -9,11 +9,11 @@ FactoryBot.define do
       end
     end
 
-    trait :with_flow_stages do 
+    trait :with_flow_stages do
       after(:build) do |flow|
-        flow.flow_stages << FactoryBot.build(:supervisor_flow_stage)
-        flow.flow_stages << FactoryBot.build(:other_dept_managers_flow_stage, :with_other_dept_managers)
-        flow.flow_stages << FactoryBot.build(:president_flow_stage, :with_president)
+        flow.signing_flow_stages << FactoryBot.build(:supervisor_flow_stage)
+        flow.signing_flow_stages << FactoryBot.build(:other_dept_managers_flow_stage, :with_other_dept_managers)
+        flow.signing_flow_stages << FactoryBot.build(:president_flow_stage, :with_president)
       end
     end
   end
