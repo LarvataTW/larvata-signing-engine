@@ -11,3 +11,5 @@ tags
 .rbenv-gemsets
 .idea/
 .idea/larvata-signing.iml
+.idea/.gitignore
+.idea/vcs.xml
