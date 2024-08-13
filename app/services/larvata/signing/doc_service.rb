@@ -156,7 +156,7 @@ module Larvata
             rec.comment = comment
             rec.save!
 
-            if stage.is_first? or opt.empty? # 駁回
+            if stage.is_first? or opt[:return_stage_seq].blank? # 駁回
               # 駁回的階段狀態變為已完成
               stage.state = "completed"
               stage.save!
@@ -224,7 +224,7 @@ module Larvata
       # @param string opt[:waiting_stage_typing] 要加簽的簽核階段類型（串簽、會簽、擇辦）
       # @param string opt[:waiting_signer_ids] 要加簽的簽核人員，多筆以逗點分隔
       def wait(comment, srecords, **opt)
-        if opt.empty?
+        if opt[:waiting_signer_ids].blank?
           errors.add(:doc, I18n.t('labels.doc.must_select_signer_for_waiting'))
           return
         end
